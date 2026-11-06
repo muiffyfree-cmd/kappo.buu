@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- @include admin-head -->
+<title>予約の詳細｜割烹 舞ぅ 管理画面</title>
+</head>
+<body>
+<!-- @include admin-header -->
+<main class="a-main" id="main" hidden>
+  <h1 class="a-title" id="pageTitle">予約を登録</h1>
+
+  <section class="panel" id="statusPanel" aria-labelledby="stTitle" hidden>
+    <h2 id="stTitle">状態 <small id="codeText"></small></h2>
+    <div class="checks" role="group" aria-label="状態を変更" id="statusBtns"></div>
+    <p class="muted" id="metaText" style="margin-top:8px"></p>
+  </section>
+
+  <form class="panel" id="f" novalidate>
+    <div class="fld">経路
+      <div class="seg" role="radiogroup" aria-label="経路" id="sourceSeg">
+        <label><input type="radio" name="source" value="phone">電話</label>
+        <label><input type="radio" name="source" value="dm">DM</label>
+        <label><input type="radio" name="source" value="walkin">来店</label>
+        <label><input type="radio" name="source" value="web">Web</label>
+        <label><input type="radio" name="source" value="other">他</label>
+      </div>
+    </div>
+    <label class="fld">日付<input type="date" name="day" required></label>
+    <div class="fld">部
+      <div class="seg" role="radiogroup" aria-label="部">
+        <label><input type="radio" name="service" value="lunch">昼</label>
+        <label><input type="radio" name="service" value="dinner">夜</label>
+      </div>
+    </div>
+    <div class="row">
+      <label class="fld">時間<select name="slot" required></select></label>
+      <label class="fld">人数<input type="number" name="people" min="1" max="40" inputmode="numeric" required></label>
+    </div>
+    <p class="muted" id="leftText" aria-live="polite"></p>
+    <label class="fld">コース<input name="course" list="courseList" autocomplete="off"><datalist id="courseList"></datalist></label>
+    <label class="fld">お名前<input name="name" autocomplete="off" required maxlength="100"></label>
+    <label class="fld">電話番号<input name="tel" type="tel" inputmode="tel" autocomplete="off" maxlength="30"></label>
+    <label class="fld">メールアドレス<span class="hint">任意（Webからの予約には入っています）</span><input name="email" type="email" autocomplete="off" maxlength="200"></label>
+    <label class="fld">アレルギー・ご要望<textarea name="note" maxlength="1000"></textarea></label>
+    <label class="fld">店用メモ<span class="hint">お客様には見えません</span><textarea name="staff_memo"></textarea></label>
+    <div class="warn" id="warn" role="alert" hidden></div>
+    <p class="msg" id="msg" role="alert"></p>
+    <div class="btns">
+      <a class="b b--line" id="backLink" href="/admin/">戻る</a>
+      <button class="b b--black" type="submit" id="saveBtn">保存する</button>
+    </div>
+  </form>
+</main>
+<script type="module" src="/js/admin/reservation.js"></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- @include head -->
+<title>空き状況・ご予約｜割烹 舞ぅ（長崎・銅座）</title>
+<meta name="description" content="割烹 舞ぅの空き状況カレンダーとWeb予約。昼・夜それぞれの空きが分かり、24時間ご予約いただけます（1〜4名様）。">
+<meta property="og:image" content="/assets/img/exterior.jpg">
+</head>
+<body data-page="reserve">
+<!-- @include header -->
+
+<main id="main">
+  <div class="page-head"><span class="en" lang="en">RESERVE</span><h1>空き状況・ご予約</h1></div>
+  <nav class="crumbs" aria-label="パンくずリスト"><ol><li><a href="/">トップ</a></li><li aria-current="page">空き状況・ご予約</li></ol></nav>
+
+  <section class="sec bg-paper" id="reserve" aria-label="空き状況カレンダー" tabindex="-1">
+    <div class="wrap">
+      <p class="sec-lead sec-lead--top">日付を選ぶと、空いている時間がすぐに分かります。<br><strong>Web予約は24時間受付</strong>（1〜4名様）／予約が完了すると確認メールが届きます。</p>
+
+      <div class="part-switch" id="partSwitch" role="group" aria-label="表示する部">
+        <button type="button" data-part="lunch" aria-pressed="false">昼の部<small>11:00〜13:00</small></button>
+        <button type="button" data-part="dinner" aria-pressed="true">夜の部<small>18:00〜20:00</small></button>
+      </div>
+      <div class="legend" aria-label="記号の見かた">
+        <span><b aria-hidden="true">○</b>空きあり</span>
+        <span><b aria-hidden="true">△</b>残りわずか</span>
+        <span><b class="mk-none" aria-hidden="true">×</b>満席</span>
+        <span><b class="mk-none" aria-hidden="true">休</b>休業日</span>
+        <span><b class="mk-none" aria-hidden="true">－</b>受付外</span>
+      </div>
+      <p class="demo-flag" id="demoFlag" hidden>デモ表示です（実際の空き状況ではありません）</p>
+
+      <div class="cal-box">
+        <div class="cal-nav">
+          <button type="button" id="prevM">‹ 前月</button>
+          <h2 id="calTitle" class="cal-title" aria-live="polite">----年--月</h2>
+          <button type="button" id="nextM">翌月 ›</button>
+        </div>
+        <div class="cal" id="cal"></div>
+        <p class="cal-msg" id="calMsg" aria-live="polite">読み込み中…</p>
+      </div>
+
+      <div class="res-rules" id="cancel-policy">
+        <h2>ご予約について</h2>
+        <ul>
+          <li>Web予約は1〜4名様まで。<strong>5名様以上はお電話</strong>でご予約ください。</li>
+          <li><strong>貸切</strong>（20名様まで）もお電話でご相談ください。</li>
+          <li>Web予約の受付は、ご来店の<span id="cutoffText">3時間</span>前までです。それ以降はお電話でお問い合わせください。</li>
+        </ul>
+      </div>
+      <div class="res-rules">
+        <h2>キャンセル規定</h2>
+        <!-- TODO キャンセル規定は仮 -->
+        <ul>
+          <li>前日のキャンセル：コース料金の50%</li>
+          <li>当日のキャンセル・ご連絡のない場合：コース料金の100%</li>
+          <li>変更・キャンセルはお電話でご連絡ください（受付 <span data-tel-hours>10:00–22:00（日曜休）</span>）。</li>
+        </ul>
+      </div>
+      <p class="other-ways">お電話（<a href="tel:0958238510" data-tel data-tel-text>095-823-8510</a>）や <a href="https://www.instagram.com/kappou_buu/" data-ig target="_blank" rel="noopener">Instagram のDM</a> でも、これまで通り承っております。</p>
+    </div>
+  </section>
+</main>
+
+<!-- @include footer -->
+
+<!-- 予約モーダル -->
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <button type="button" class="sheet__x" id="modalClose" aria-label="閉じる">×</button>
+    <h3 id="mTitle" tabindex="-1">ご予約</h3>
+    <ol class="steps" id="steps" aria-hidden="true"><li></li><li></li><li></li><li></li></ol>
+    <p class="steps-label" id="stepsLabel">ステップ 1 / 4</p>
+    <div id="mBody"></div>
+  </div>
+</div>
+
+<script type="module" src="/js/main.js"></script>
+<script type="module" src="/js/reserve.js"></script>
+</body>
+</html>

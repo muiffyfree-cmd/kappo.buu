@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- @include admin-head -->
+<title>今日・明日の予約｜割烹 舞ぅ 管理画面</title>
+</head>
+<body>
+<!-- @include admin-header -->
+<main class="a-main" id="main" hidden>
+  <h1 class="a-title">今日・明日の予約<span class="sp"></span><button type="button" class="b b--sm b--line" id="reload">更新</button></h1>
+  <div class="grid2">
+    <section class="panel" aria-labelledby="todayTitle"><h2 id="todayTitle">今日 <small id="todayDate"></small></h2><div id="today" class="loading">読み込み中…</div></section>
+    <section class="panel" aria-labelledby="tomTitle"><h2 id="tomTitle">明日 <small id="tomDate"></small></h2><div id="tomorrow" class="loading">読み込み中…</div></section>
+  </div>
+</main>
+<script type="module" src="/js/admin/dashboard.js"></script>
+</body>
+</html>

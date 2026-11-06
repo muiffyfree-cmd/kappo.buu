@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- @include admin-head -->
+<title>お品書き｜割烹 舞ぅ 管理画面</title>
+</head>
+<body>
+<!-- @include admin-header -->
+<main class="a-main" id="main" hidden>
+  <h1 class="a-title">お品書き<span class="sp"></span><a class="b b--sm b--line" href="/menu.html" target="_blank" rel="noopener">プレビュー</a></h1>
+  <p class="muted" style="margin:-6px 4px 12px">保存するとすぐサイト（お品書きのページとトップ）に反映されます。「お休み」にすると非表示になります。</p>
+
+  <!-- 編集フォーム（「編集」「＋追加」で開く） -->
+  <form class="panel" id="f" novalidate hidden>
+    <h2 id="formTitle" tabindex="-1">品を追加</h2>
+    <div class="row">
+      <label class="fld">区分<select name="category">
+        <option value="dinner">夜のコース</option><option value="lunch">お昼の定食</option>
+        <option value="option">セット・オプション</option><option value="drink">お飲み物</option></select></label>
+      <label class="fld">バッジ<span class="hint">例：冬季限定・おすすめ</span><input name="badge" maxlength="20"></label>
+    </div>
+    <label class="fld">名前<input name="name" maxlength="60" required></label>
+    <label class="fld">品数・ひとこと<span class="hint">例：11品／お昼のお得なセット</span><input name="subtitle" maxlength="60"></label>
+    <div class="row">
+      <label class="fld">価格（円）<span class="hint">空欄＝価格を出さない</span><input name="price" type="number" min="0" max="1000000" inputmode="numeric"></label>
+      <label class="fld">価格の注記<span class="hint">税込／サービス料10%別／＋</span><input name="price_note" list="priceNotes" maxlength="30"><datalist id="priceNotes"><option value="税込"><option value="サービス料10%別"><option value="＋"></datalist></label>
+    </div>
+    <label class="fld">内容<textarea name="description" rows="3" maxlength="400"></textarea></label>
+    <div class="fld">半月替わりの例
+      <input name="examples_note" maxlength="60" placeholder="以下メニューは半月に一度変更（例）" style="margin-bottom:4px">
+      <div class="ex-rows" id="exRows"></div>
+      <button type="button" class="b b--sm b--line" id="exAdd" style="margin-top:6px">＋ 行を追加</button>
+    </div>
+    <div class="fld">写真<span class="hint">長辺1600pxに縮小してから送ります</span>
+      <div class="photo"><span id="photoView"></span>
+        <label class="b b--sm b--line file-btn">写真を選ぶ<input type="file" accept="image/*" id="photoFile"></label>
+        <button type="button" class="b b--sm b--line" id="photoRemove">写真を外す</button></div>
+    </div>
+    <div class="row">
+      <label class="fld">期間限定の開始日<span class="hint">空欄＝制限なし</span><input name="available_from" type="date"></label>
+      <label class="fld">終了日<input name="available_until" type="date"></label>
+    </div>
+    <div class="checks">
+      <label><input type="checkbox" name="is_available">提供中（外すとお休み）</label>
+      <label><input type="checkbox" name="reservable">予約フォームのコースに出す</label>
+    </div>
+    <p class="msg" id="msg" role="alert"></p>
+    <div class="btns">
+      <button type="button" class="b b--line" id="cancelBtn">閉じる</button>
+      <button type="submit" class="b b--black" id="saveBtn">保存する</button>
+    </div>
+    <div class="btns" id="delWrap" hidden><button type="button" class="b b--line" id="delBtn">この品を削除</button></div>
+    <div class="warn" id="warn" hidden></div>
+  </form>
+
+  <div id="lists"><p class="loading">読み込み中…</p></div>
+
+  <form class="panel" id="notes" novalidate>
+    <h2>共通の注記</h2>
+    <label class="fld">夜のコースの下に出す文<input name="course_service_note" maxlength="200"></label>
+    <label class="fld">お品書きの最後に出す文<textarea name="menu_note" rows="2" maxlength="300"></textarea></label>
+    <p class="msg" id="notesMsg" role="alert"></p>
+    <div class="btns"><button class="b b--black" type="submit">注記を保存</button></div>
+  </form>
+</main>
+<script type="module" src="/js/admin/menu.js"></script>
+</body>
+</html>

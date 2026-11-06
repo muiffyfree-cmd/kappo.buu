@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- @include admin-head -->
+<title>設定｜割烹 舞ぅ 管理画面</title>
+</head>
+<body>
+<!-- @include admin-header -->
+<main class="a-main" id="main" hidden>
+  <h1 class="a-title">設定</h1>
+  <form id="f" novalidate>
+    <section class="panel">
+      <h2>席と人数</h2>
+      <div class="row">
+        <label class="fld">席数<span class="hint">合計</span><input type="number" name="capacity" min="1" max="200" inputmode="numeric" required></label>
+        <label class="fld">Web予約の上限人数<span class="hint">これを超えるとお電話へ</span><input type="number" name="max_web_people" min="1" max="20" inputmode="numeric" required></label>
+      </div>
+      <label class="fld">△（残りわずか）にする残席<span class="hint">いちばん空いている時間の残席がこの数以下なら △</span><input type="number" name="few_threshold" min="0" max="200" inputmode="numeric" required></label>
+    </section>
+    <section class="panel">
+      <h2>営業日</h2>
+      <div class="fld">定休曜日<div class="checks" id="dows"></div></div>
+    </section>
+    <section class="panel">
+      <h2>時間枠</h2>
+      <label class="fld">昼の時間枠<span class="hint">「,」区切り（例：11:00, 11:30, 12:00）</span><input name="lunch_slots" required></label>
+      <label class="fld">夜の時間枠<span class="hint">「,」区切り</span><input name="dinner_slots" required></label>
+      <div class="row">
+        <label class="fld">昼の滞在時間（分）<input type="number" name="lunch_stay_min" min="15" max="600" step="5" inputmode="numeric" required></label>
+        <label class="fld">夜の滞在時間（分）<input type="number" name="dinner_stay_min" min="15" max="600" step="5" inputmode="numeric" required></label>
+      </div>
+      <p class="muted" style="margin-top:8px">滞在時間が重なる予約は、同じ席を使っているものとして残席を計算します。</p>
+    </section>
+    <section class="panel">
+      <h2>Web予約の受付</h2>
+      <div class="row">
+        <label class="fld">締切<span class="hint">来店の何時間前まで</span><input type="number" name="cutoff_hours" min="0" max="168" inputmode="numeric" required></label>
+        <label class="fld">受付期間<span class="hint">今日から何日先まで</span><input type="number" name="booking_days" min="1" max="366" inputmode="numeric" required></label>
+      </div>
+    </section>
+    <p class="msg" id="msg" role="alert"></p>
+    <div class="btns"><button class="b b--black" type="submit">保存する</button></div>
+  </form>
+</main>
+<script type="module" src="/js/admin/settings.js"></script>
+</body>
+</html>

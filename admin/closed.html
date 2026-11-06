@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- @include admin-head -->
+<title>臨時休業日｜割烹 舞ぅ 管理画面</title>
+</head>
+<body>
+<!-- @include admin-header -->
+<main class="a-main" id="main" hidden>
+  <h1 class="a-title">臨時休業日</h1>
+  <form class="panel" id="f" novalidate>
+    <h2>休業日を追加</h2>
+    <div class="row">
+      <label class="fld">日付<input type="date" name="day" required></label>
+      <label class="fld">理由<span class="hint">任意・店用</span><input name="reason" maxlength="100" placeholder="仕入れのため など"></label>
+    </div>
+    <p class="msg" id="msg" role="alert"></p>
+    <div class="btns"><button class="b b--black" type="submit">追加する</button></div>
+    <p class="muted" style="margin-top:10px">定休曜日（日曜）は「設定」で変更します。追加した日は公開カレンダーで「休」になり、Web予約ができなくなります。</p>
+  </form>
+  <section class="panel" aria-labelledby="listTitle">
+    <h2 id="listTitle">これからの休業日</h2>
+    <ul class="tlist" id="list"><li class="empty">読み込み中…</li></ul>
+    <details style="margin-top:12px"><summary class="muted" style="cursor:pointer;min-height:44px;display:flex;align-items:center">過去の休業日</summary><ul class="tlist" id="past"></ul></details>
+  </section>
+</main>
+<script type="module" src="/js/admin/closed.js"></script>
+</body>
+</html>

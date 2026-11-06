@@ -1,0 +1,4 @@
+# 仮ドメインの間、検索に出さない（Cloudflare Pages / Netlify 用）
+# 本番公開時はこの X-Robots-Tag の行を削除する
+/*
+  X-Robots-Tag: noindex, nofollow

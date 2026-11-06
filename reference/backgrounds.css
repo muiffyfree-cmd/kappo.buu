@@ -1,0 +1,40 @@
+/* =========================================================
+   舞ぅ 背景パターン
+   .bg-paper      … 生成り＋金の粒（お知らせ・こだわり・空き状況）
+   .gold-washi-bg … 和紙＋金箔（ご挨拶・お品書き・店舗情報）
+   ========================================================= */
+
+/* ---------- 白の部分の共通背景：生成り＋金の粒 ---------- */
+.bg-paper{ position:relative; background:var(--paper); isolation:isolate; }
+.bg-paper::before{
+  content:""; position:absolute; inset:0; z-index:-1; pointer-events:none; opacity:.45;
+  background-image:
+    radial-gradient(circle at 8% 14%,  #b99b58 0 1px,   transparent 2px),
+    radial-gradient(circle at 73% 24%, #d4b878 0 1.5px, transparent 3px),
+    radial-gradient(circle at 29% 78%, #c4a96e 0 1px,   transparent 2px);
+  background-size:173px 131px, 229px 193px, 143px 207px;
+}
+
+
+/* ---------- 和紙＋金箔（v2.2）：ご挨拶・お品書き・店舗情報 ---------- */
+.gold-washi-bg{ position:relative; isolation:isolate; background-color:#fffaf2; overflow:hidden; }
+/* 和紙のような淡い質感 */
+.gold-washi-bg::before{
+  content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(ellipse at 12% 18%, rgba(205,171,102,.055), transparent 42%),
+    radial-gradient(ellipse at 84% 86%, rgba(207,181,130,.065), transparent 47%),
+    repeating-linear-gradient(34deg, rgba(143,111,64,.016) 0 1px, transparent 1px 5px);
+}
+/* 散りばめられた金箔 */
+.gold-washi-bg::after{
+  content:""; position:absolute; inset:0; z-index:-1; pointer-events:none; opacity:.7;
+  background-image:
+    radial-gradient(ellipse at 23% 37%, #c89c36 0 .7px, transparent 1.7px),
+    radial-gradient(ellipse at 74% 63%, #e2bd61 0 1.2px, transparent 2.3px),
+    radial-gradient(ellipse at 40% 84%, #ac7f29 0 .6px, transparent 1.4px),
+    radial-gradient(ellipse at 87% 17%, #d3a84b 0 1px, transparent 2px),
+    radial-gradient(ellipse at 54% 31%, #eccb7d 0 .7px, transparent 2px);
+  background-size:113px 107px, 173px 139px, 149px 187px, 211px 157px, 97px 163px;
+}
+/* 注意：.bg-paper と .gold-washi-bg は同じ要素に併用しない（どちらも ::before を使うため） */

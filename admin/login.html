@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- @include admin-head -->
+<title>ログイン｜割烹 舞ぅ 管理画面</title>
+</head>
+<body>
+<main class="login" id="main">
+  <div class="card">
+    <img class="logo" src="/assets/img/logo-black.png" alt="割烹 舞ぅ" width="64" height="64">
+    <h1>管理画面</h1>
+
+    <form id="loginForm" novalidate>
+      <label class="fld">メールアドレス<input type="email" name="email" autocomplete="username" required></label>
+      <label class="fld">パスワード<input type="password" name="password" autocomplete="current-password" required></label>
+      <p class="msg" id="loginMsg" role="alert"></p>
+      <div class="btns"><button class="b b--black b--wide" type="submit">ログイン</button></div>
+      <button type="button" class="link" id="toReset">パスワードを忘れた方</button>
+    </form>
+
+    <form id="resetForm" novalidate hidden>
+      <p class="muted">登録しているメールアドレスに、パスワード再設定のリンクをお送りします。</p>
+      <label class="fld">メールアドレス<input type="email" name="email" autocomplete="username" required></label>
+      <p class="msg" id="resetMsg" role="alert"></p>
+      <div class="btns"><button class="b b--black b--wide" type="submit">再設定メールを送る</button></div>
+      <button type="button" class="link" id="toLogin">ログインに戻る</button>
+    </form>
+
+
+    <div class="demo-box" id="demoBox" hidden>
+      <b>デモモード</b>（.env が未設定）<br>
+      管理者：<code>demo@kappo-buu.jp</code> / <code>demo1234</code><br>
+      権限なし：<code>guest@kappo-buu.jp</code> / <code>guest1234</code>
+    </div>
+  </div>
+</main>
+<script type="module" src="/js/admin/login.js"></script>
+</body>
+</html>

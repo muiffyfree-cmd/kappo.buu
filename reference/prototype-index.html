@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>割烹 〇〇｜長崎の小さな割烹</title>
+<meta name="description" content="長崎の小さな割烹〇〇。旬の地魚を使ったおまかせのコースをご用意しています。空き状況の確認とご予約はWebから24時間受け付けています。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700&family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1b1a18; --paper:#f6f2ea; --paper2:#ece5d8; --line:#cfc5b3;
+  --shu:#a8322d; --muted:#6f675b; --white:#fffdf8;
+  --serif:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+  --sans:"Noto Sans JP","Hiragino Sans",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{font-family:var(--sans);color:var(--ink);background:var(--paper);line-height:1.9;letter-spacing:.04em;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img{max-width:100%;display:block}
+
+/* ---------- header ---------- */
+header{position:fixed;inset:0 0 auto 0;z-index:50;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(27,26,24,.92);color:var(--white);backdrop-filter:blur(6px)}
+.logo{font-family:var(--serif);font-weight:700;font-size:1.35rem;letter-spacing:.2em;text-decoration:none;display:flex;align-items:center;gap:10px}
+.logo .mark{width:30px;height:30px;border:1.5px solid var(--white);border-radius:50%;display:grid;place-items:center;font-size:.85rem;letter-spacing:0}
+nav ul{display:flex;gap:28px;list-style:none;align-items:center}
+nav a{text-decoration:none;font-size:.8rem;display:flex;flex-direction:column;align-items:center;line-height:1.3}
+nav a small{font-size:.6rem;letter-spacing:.18em;opacity:.6;font-family:var(--serif)}
+nav .btn-reserve{background:var(--shu);padding:8px 16px;border-radius:2px}
+nav .btn-reserve small{opacity:.85}
+.menu-toggle{display:none;background:none;border:0;color:var(--white);font-size:1.5rem;cursor:pointer}
+
+/* ---------- hero ---------- */
+.hero{position:relative;height:100svh;min-height:560px;overflow:hidden;color:var(--white)}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity 1.6s ease;background-size:cover;background-position:center}
+.slide.on{opacity:1}
+.slide::after{content:attr(data-label);position:absolute;right:20px;bottom:20px;font-size:.7rem;opacity:.5}
+.s1{background:radial-gradient(ellipse at 30% 40%,#5a4a3a 0%,#2a221b 55%,#121010 100%)}
+.s2{background:radial-gradient(ellipse at 70% 60%,#3e4a48 0%,#1f2625 55%,#0f1212 100%)}
+.s3{background:radial-gradient(ellipse at 50% 30%,#6b3a2c 0%,#2b1a15 55%,#120c0a 100%)}
+.hero-copy{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:48px;padding:80px 24px 40px}
+.vtitle{writing-mode:vertical-rl;font-family:var(--serif);font-size:clamp(1.6rem,4vw,2.6rem);letter-spacing:.35em;line-height:1.9;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+.hero-copy{flex-direction:row-reverse;align-items:flex-start;padding-top:22vh}
+.vsub{font-size:clamp(.85rem,1.6vw,1.05rem)!important;opacity:.85;margin-top:.4em}
+.hero-cta{position:absolute;left:50%;bottom:48px;transform:translateX(-50%);display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;font-family:var(--serif);font-size:.95rem;letter-spacing:.15em;text-decoration:none;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer;transition:.25s}
+.btn-shu{background:var(--shu);border-color:var(--shu);color:var(--white)}
+.btn-shu:hover{background:#8e2924}
+.btn-ghost:hover{background:rgba(255,255,255,.12)}
+
+/* ---------- sections ---------- */
+section{padding:112px 24px}
+.wrap{max-width:1040px;margin:0 auto}
+.sec-head{text-align:center;margin-bottom:56px}
+.sec-head .en{display:block;font-family:var(--serif);font-size:.75rem;letter-spacing:.4em;color:var(--shu)}
+.sec-head h2{font-family:var(--serif);font-weight:600;font-size:clamp(1.5rem,3vw,2rem);letter-spacing:.2em;margin-top:6px}
+.sec-head h2::after{content:"";display:block;width:1px;height:36px;background:var(--ink);margin:18px auto 0;opacity:.5}
+.dark{background:var(--ink);color:var(--white)}
+.dark .sec-head h2::after{background:var(--white)}
+.alt{background:var(--paper2)}
+
+/* welcome */
+.welcome{display:grid;grid-template-columns:auto 1fr;gap:64px;align-items:center}
+.welcome .vtitle{text-shadow:none;font-size:clamp(1.4rem,3vw,2rem);color:var(--ink)}
+.welcome p{font-family:var(--serif);font-size:1.02rem;line-height:2.4}
+.sign{margin-top:24px;text-align:right;font-family:var(--serif)}
+
+/* kodawari */
+.koda{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;margin-bottom:88px}
+.koda:last-child{margin-bottom:0}
+.koda.rev .ph{order:2}
+.ph{aspect-ratio:4/3;background:linear-gradient(135deg,#3b3229,#18140f);position:relative;display:grid;place-items:center;color:rgba(255,255,255,.35);font-size:.8rem;letter-spacing:.2em}
+.ph.light{background:linear-gradient(135deg,#d9cfbd,#b8ab94);color:rgba(0,0,0,.35)}
+.koda h3{font-family:var(--serif);font-size:1.4rem;letter-spacing:.15em;margin-bottom:6px}
+.koda .num{font-family:var(--serif);color:var(--shu);font-size:.8rem;letter-spacing:.3em}
+.koda p{margin-top:18px;color:#3a362f}
+
+/* menu */
+.courses{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.course{border:1px solid rgba(255,255,255,.25);padding:36px 28px;text-align:center;position:relative}
+.course .tag{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--shu);font-size:.7rem;padding:2px 12px;letter-spacing:.2em}
+.course h3{font-family:var(--serif);font-size:1.3rem;letter-spacing:.2em}
+.course .price{font-family:var(--serif);font-size:1.6rem;margin:12px 0 4px}
+.course .price small{font-size:.75rem}
+.course ul{list-style:none;margin-top:18px;font-size:.85rem;opacity:.85;line-height:2.1;border-top:1px solid rgba(255,255,255,.18);padding-top:18px}
+.menu-note{text-align:center;margin-top:32px;font-size:.8rem;opacity:.7}
+.ippin{margin-top:64px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.ippin div{text-align:center;font-family:var(--serif);font-size:.9rem}
+.ippin .ph{aspect-ratio:1;margin-bottom:10px}
+
+/* reserve */
+.res-lead{text-align:center;margin-bottom:36px}
+.res-lead strong{color:var(--shu)}
+.legend{display:flex;gap:20px;justify-content:center;font-size:.85rem;margin-bottom:20px;flex-wrap:wrap}
+.legend span b{font-family:var(--serif);font-size:1.05rem;margin-right:4px}
+.cal-box{background:var(--white);border:1px solid var(--line);padding:24px;max-width:720px;margin:0 auto}
+.cal-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.cal-nav h3{font-family:var(--serif);font-size:1.25rem;letter-spacing:.15em}
+.cal-nav button{background:none;border:1px solid var(--line);padding:6px 14px;cursor:pointer;font-family:var(--serif)}
+.cal-nav button:disabled{opacity:.3;cursor:default}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .dow{text-align:center;font-size:.75rem;color:var(--muted);padding:4px 0}
+.cal .dow.sun{color:var(--shu)} .cal .dow.sat{color:#2f5a8a}
+.day{aspect-ratio:1/1.05;border:1px solid var(--paper2);background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.85rem;cursor:pointer;transition:.15s;padding:0;font-family:inherit;color:inherit}
+.day .st{font-family:var(--serif);font-size:1.15rem;line-height:1.2}
+.day.ok .st{color:var(--shu)} .day.few .st{color:#b9741b}
+.day.full,.day.closed,.day.past{cursor:default;background:#f1ede6;color:#aaa29a}
+.day.ok:hover,.day.few:hover{border-color:var(--shu);background:var(--white)}
+.day.sel{outline:2px solid var(--shu);background:var(--white)}
+.day.empty{visibility:hidden}
+.cal-msg{font-size:.8rem;color:var(--muted);text-align:center;margin-top:12px}
+.other-ways{text-align:center;margin-top:36px;font-size:.9rem}
+.other-ways a{color:var(--shu)}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:100;background:rgba(15,13,11,.65);display:none;align-items:flex-end;justify-content:center}
+.modal.open{display:flex}
+.sheet{background:var(--white);width:100%;max-width:560px;max-height:92svh;overflow:auto;padding:28px 24px 32px;border-radius:12px 12px 0 0;position:relative}
+@media(min-width:700px){.modal{align-items:center}.sheet{border-radius:4px}}
+.sheet h3{font-family:var(--serif);font-size:1.25rem;letter-spacing:.1em;margin-bottom:4px}
+.sheet .x{position:absolute;top:12px;right:14px;background:none;border:0;font-size:1.5rem;cursor:pointer;color:var(--muted)}
+.steps{display:flex;gap:6px;margin:10px 0 20px}
+.steps i{flex:1;height:3px;background:var(--paper2)} .steps i.on{background:var(--shu)}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.slot{padding:12px 4px;border:1px solid var(--line);background:var(--paper);text-align:center;cursor:pointer;font-family:inherit;font-size:.95rem}
+.slot small{display:block;font-size:.7rem;color:var(--muted)}
+.slot:disabled{opacity:.4;cursor:default;text-decoration:line-through}
+.slot.sel{border-color:var(--shu);background:#fbeeed}
+label.f{display:block;margin-top:14px;font-size:.85rem}
+label.f span.req{color:var(--shu);font-size:.7rem;margin-left:6px}
+input,select,textarea{width:100%;margin-top:4px;padding:12px;border:1px solid var(--line);background:var(--paper);font:inherit;font-size:16px;border-radius:2px}
+textarea{min-height:80px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sheet .actions{display:flex;gap:10px;margin-top:22px}
+.sheet .actions .btn{flex:1;justify-content:center;padding:14px 10px}
+.btn-line{color:var(--ink);border-color:var(--line)}
+.confirm-tbl{width:100%;border-collapse:collapse;font-size:.9rem}
+.confirm-tbl th,.confirm-tbl td{border-bottom:1px solid var(--paper2);padding:10px 4px;text-align:left;vertical-align:top}
+.confirm-tbl th{width:34%;color:var(--muted);font-weight:400}
+.err{color:var(--shu);font-size:.85rem;margin-top:10px;min-height:1.2em}
+.done{text-align:center;padding:12px 0}
+.done .big{font-family:var(--serif);font-size:3rem;color:var(--shu);line-height:1}
+.note-s{font-size:.75rem;color:var(--muted);margin-top:12px}
+
+/* info */
+.info{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+.info table{width:100%;border-collapse:collapse;font-size:.92rem}
+.info th,.info td{padding:14px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.info th{width:30%;font-family:var(--serif);font-weight:600;white-space:nowrap}
+.map{min-height:360px;background:var(--paper2) center/cover;position:relative}
+.map::before{content:"地図（公開時に表示）";position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:.8rem}
+.map iframe{position:relative;width:100%;height:100%;min-height:360px;border:0}
+
+/* footer */
+footer{background:var(--ink);color:var(--white);padding:64px 24px 120px;text-align:center}
+footer .logo{justify-content:center;margin-bottom:20px}
+footer ul{display:flex;justify-content:center;gap:24px;list-style:none;flex-wrap:wrap;font-size:.8rem;margin-bottom:24px}
+footer ul a{text-decoration:none;opacity:.8}
+footer .copy{font-size:.7rem;opacity:.5}
+
+/* mobile bar */
+.mbar{display:none}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(24px);transition:1s ease}
+.rv.in{opacity:1;transform:none}
+
+@media(max-width:860px){
+  nav{position:fixed;inset:64px 0 auto 0;background:rgba(27,26,24,.97);max-height:0;overflow:hidden;transition:max-height .35s}
+  nav.open{max-height:480px}
+  nav ul{flex-direction:column;gap:0;padding:8px 0 20px}
+  nav li{width:100%}
+  nav a{padding:14px;flex-direction:row;justify-content:center;gap:12px}
+  .menu-toggle{display:block}
+  section{padding:80px 20px}
+  .welcome{grid-template-columns:1fr;gap:32px;justify-items:center}
+  .koda,.info{grid-template-columns:1fr;gap:24px}
+  .koda.rev .ph{order:0}
+  .courses{grid-template-columns:1fr}
+  .ippin{grid-template-columns:repeat(2,1fr)}
+  .hero-cta{bottom:96px}
+  .hero-cta .btn{white-space:nowrap;font-size:.9rem;padding:14px 22px}
+  .hero-cta .btn-ghost{display:none}
+  .mbar{display:grid;grid-template-columns:1fr 1.4fr 1fr;position:fixed;inset:auto 0 0 0;z-index:60;background:var(--ink);border-top:1px solid #333;padding-bottom:env(safe-area-inset-bottom)}
+  .mbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;color:var(--white);text-decoration:none;font-size:.72rem;gap:2px}
+  .mbar a svg{width:20px;height:20px}
+  .mbar a.main{background:var(--shu);font-family:var(--serif);font-size:.85rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== HEADER ===================== -->
+<header>
+  <a href="#top" class="logo"><span class="mark">〇</span><span>割烹 〇〇</span></a>
+  <button class="menu-toggle" aria-label="メニュー" onclick="document.querySelector('nav').classList.toggle('open')">☰</button>
+  <nav>
+    <ul>
+      <li><a href="#top">ホーム<small>HOME</small></a></li>
+      <li><a href="#concept">こだわり<small>CONCEPT</small></a></li>
+      <li><a href="#menu">お品書き<small>MENU</small></a></li>
+      <li><a href="#info">店舗情報<small>ACCESS</small></a></li>
+      <li><a href="https://www.instagram.com/" target="_blank" rel="noopener" class="ig-link">Instagram<small>FOLLOW</small></a></li>
+      <li><a href="#reserve" class="btn-reserve">空き状況・ご予約<small>RESERVE</small></a></li>
+    </ul>
+  </nav>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<div class="hero" id="top">
+  <div class="slide s1 on" data-label="写真①：カウンター越しの大将"></div>
+  <div class="slide s2" data-label="写真②：お造り"></div>
+  <div class="slide s3" data-label="写真③：店の外観・暖簾"></div>
+  <div class="hero-copy">
+    <p class="vtitle vsub">長崎　小さな割烹</p>
+    <h1 class="vtitle">旬を、一皿に。</h1>
+  </div>
+  <div class="hero-cta">
+    <a href="#reserve" class="btn btn-shu">空き状況を見る・予約する</a>
+    <a href="#menu" class="btn btn-ghost">お品書き</a>
+  </div>
+</div>
+
+<!-- ===================== WELCOME ===================== -->
+<section id="welcome">
+  <div class="wrap welcome rv">
+    <h2 class="vtitle">ようこそ、〇〇へ</h2>
+    <div>
+      <p>長崎の港にあがる、その日いちばんの魚。<br>
+      季節の野菜と、手間を惜しまない出汁。<br>
+      カウンター〇席の小さな店だからこそ、<br>
+      おひとりおひとりの顔を見ながら、<br>
+      一皿ずつ心を込めてお出しいたします。</p>
+      <p class="sign">店主　〇〇 〇〇</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CONCEPT ===================== -->
+<section id="concept" class="alt">
+  <div class="wrap">
+    <div class="sec-head rv"><span class="en">CONCEPT</span><h2>こだわり</h2></div>
+
+    <div class="koda rv">
+      <div class="ph">写真：魚・仕入れ</div>
+      <div>
+        <span class="num">其の一</span>
+        <h3>素材 ─ 長崎の地魚</h3>
+        <p>毎朝市場に足を運び、自分の目で選んだ魚だけを仕入れています。長崎近海でとれる季節の魚を、その魚に合った仕事でお出しします。</p>
+      </div>
+    </div>
+
+    <div class="koda rev rv">
+      <div class="ph">写真：お椀・出汁</div>
+      <div>
+        <span class="num">其の二</span>
+        <h3>仕事 ─ 一番出汁</h3>
+        <p>お椀に使う出汁は、毎日営業前に引いています。派手さはなくても、最後の一滴まで飲みたくなる味を目指しています。</p>
+      </div>
+    </div>
+
+    <div class="koda rv">
+      <div class="ph light">写真：カウンター席</div>
+      <div>
+        <span class="num">其の三</span>
+        <h3>おもてなし ─ 目の前のカウンター</h3>
+        <p>目の前で仕上げる料理と、大将との会話も楽しんでいただけます。記念日やおひとりさまのご利用も、どうぞお気軽に。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MENU ===================== -->
+<section id="menu" class="dark">
+  <div class="wrap">
+    <div class="sec-head rv"><span class="en">MENU</span><h2>お品書き</h2></div>
+    <div class="courses rv">
+      <div class="course">
+        <h3>旬の会席</h3>
+        <p class="price">〇,〇〇〇<small>円（税込）</small></p>
+        <ul><li>先付</li><li>お椀</li><li>お造り</li><li>焼物</li><li>食事・水物</li></ul>
+      </div>
+      <div class="course">
+        <span class="tag">おすすめ</span>
+        <h3>おまかせ</h3>
+        <p class="price">〇,〇〇〇<small>円（税込）</small></p>
+        <ul><li>先付・八寸</li><li>お椀</li><li>お造り</li><li>焼物・揚物</li><li>炊合せ</li><li>食事・水物</li></ul>
+      </div>
+      <div class="course">
+        <h3>特選</h3>
+        <p class="price">〇〇,〇〇〇<small>円（税込）</small></p>
+        <ul><li>季節の特選素材を使った品々</li><li>※〇日前までのご予約</li></ul>
+      </div>
+    </div>
+    <p class="menu-note">※ 仕入れにより内容が変わります。アレルギー・苦手な食材は、ご予約のときにお知らせください。</p>
+    <div class="ippin rv">
+      <div><div class="ph">写真</div>お造り盛合せ</div>
+      <div><div class="ph">写真</div>季節の焼物</div>
+      <div><div class="ph">写真</div>お椀</div>
+      <div><div class="ph">写真</div>土鍋ご飯</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== RESERVE ===================== -->
+<section id="reserve">
+  <div class="wrap">
+    <div class="sec-head rv"><span class="en">RESERVE</span><h2>空き状況・ご予約</h2></div>
+    <p class="res-lead">日付を選ぶと、空いている時間とお席がすぐに分かります。<br><strong>Web予約は24時間受付</strong>／予約が完了すると確認メールが届きます。</p>
+    <div class="legend">
+      <span><b style="color:var(--shu)">○</b>空きあり</span>
+      <span><b style="color:#b9741b">△</b>残りわずか</span>
+      <span><b style="color:#aaa">×</b>満席</span>
+      <span><b style="color:#aaa">休</b>定休日</span>
+    </div>
+    <div class="cal-box">
+      <div class="cal-nav">
+        <button id="prevM" aria-label="前の月">‹ 前月</button>
+        <h3 id="calTitle">----年--月</h3>
+        <button id="nextM" aria-label="次の月">翌月 ›</button>
+      </div>
+      <div class="cal" id="cal"></div>
+      <p class="cal-msg" id="calMsg">読み込み中…</p>
+    </div>
+    <p class="other-ways">お電話（<a href="tel:0000000000" class="tel-link">000-000-0000</a>）や <a href="https://www.instagram.com/" target="_blank" rel="noopener" class="ig-link">Instagram のDM</a> でも、これまで通り承っております。</p>
+  </div>
+</section>
+
+<!-- ===================== INFO ===================== -->
+<section id="info" class="alt">
+  <div class="wrap">
+    <div class="sec-head rv"><span class="en">SHOP INFO</span><h2>店舗情報</h2></div>
+    <div class="info rv">
+      <table>
+        <tr><th>店名</th><td>割烹 〇〇（かっぽう 〇〇）</td></tr>
+        <tr><th>住所</th><td>〒850-0000<br>長崎県長崎市〇〇町0-0</td></tr>
+        <tr><th>アクセス</th><td>〇〇電停から徒歩〇分</td></tr>
+        <tr><th>電話</th><td><a href="tel:0000000000" class="tel-link">000-000-0000</a></td></tr>
+        <tr><th>営業時間</th><td>17:30〜22:00（L.O. 21:00）</td></tr>
+        <tr><th>定休日</th><td>〇曜日</td></tr>
+        <tr><th>席数</th><td>カウンター〇席・個室〇室</td></tr>
+        <tr><th>お支払い</th><td>現金・カード（〇〇）</td></tr>
+        <tr><th>ご予約</th><td><a href="#reserve">Web（24時間）</a>・お電話・Instagram DM</td></tr>
+      </table>
+      <div class="map">
+        <iframe src="https://www.google.com/maps?q=%E9%95%B7%E5%B4%8E%E5%B8%82&z=15&output=embed" loading="lazy" title="地図"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <a href="#top" class="logo"><span class="mark">〇</span><span>割烹 〇〇</span></a>
+  <ul>
+    <li><a href="#concept">こだわり</a></li>
+    <li><a href="#menu">お品書き</a></li>
+    <li><a href="#reserve">空き状況・ご予約</a></li>
+    <li><a href="#info">店舗情報</a></li>
+    <li><a href="https://www.instagram.com/" target="_blank" rel="noopener" class="ig-link">Instagram</a></li>
+  </ul>
+  <p class="copy">© <span id="yr"></span> 割烹 〇〇 All Rights Reserved.</p>
+</footer>
+
+<!-- mobile fixed bar -->
+<div class="mbar">
+  <a href="tel:0000000000" class="tel-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2"/></svg>電話</a>
+  <a href="#reserve" class="main">空き状況・予約</a>
+  <a href="https://www.instagram.com/" target="_blank" rel="noopener" class="ig-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor"/></svg>Instagram</a>
+</div>
+
+<!-- ===================== BOOKING MODAL ===================== -->
+<div class="modal" id="modal" role="dialog" aria-modal="true">
+  <div class="sheet">
+    <button class="x" aria-label="閉じる" onclick="closeModal()">×</button>
+    <h3 id="mTitle">ご予約</h3>
+    <div class="steps"><i></i><i></i><i></i><i></i></div>
+    <div id="mBody"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   設定（ここだけ書き換えればOK）
+   ============================================================ */
+const CONFIG = {
+  // GASのウェブアプリURL（空のままだとデモ表示）
+  GAS_URL: "",
+  SHOP_NAME: "割烹 〇〇",
+  TEL: "000-000-0000",
+  INSTAGRAM: "https://www.instagram.com/",
+  MONTHS_AHEAD: 2,        // 何か月先まで表示するか
+};
+
+/* ---------- 共通 ---------- */
+document.getElementById('yr').textContent = new Date().getFullYear();
+document.querySelectorAll('.tel-link').forEach(a=>{a.href='tel:'+CONFIG.TEL.replace(/-/g,'');if(!a.querySelector('svg'))a.textContent=CONFIG.TEL});
+document.querySelectorAll('.ig-link').forEach(a=>a.href=CONFIG.INSTAGRAM);
+document.querySelectorAll('nav a').forEach(a=>a.addEventListener('click',()=>document.querySelector('nav').classList.remove('open')));
+
+// スライドショー
+(()=>{const s=[...document.querySelectorAll('.slide')];let i=0;setInterval(()=>{s[i].classList.remove('on');i=(i+1)%s.length;s[i].classList.add('on')},5000)})();
+// スクロール表示
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+/* ---------- データ取得 ---------- */
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const DOW=['日','月','火','水','木','金','土'];
+let AV=null;      // {settings:{slots,maxPeople,capacity}, days:{'YYYY-MM-DD':{status,slots:{'18:00':残席}}}}
+
+async function loadAvailability(){
+  if(!CONFIG.GAS_URL){AV=demoData();return}
+  const r=await fetch(CONFIG.GAS_URL+'?action=availability');
+  AV=await r.json();
+}
+function demoData(){ // GAS未接続時のサンプル
+  const slots=['17:30','18:00','18:30','19:00','19:30','20:00'];const cap=8;const days={};
+  const t=new Date();t.setHours(0,0,0,0);
+  for(let i=0;i<70;i++){const d=new Date(t);d.setDate(t.getDate()+i);const k=ymd(d);
+    if(d.getDay()===0){days[k]={status:'closed',slots:{}};continue}
+    const s={};let tot=0;slots.forEach((sl,j)=>{const v=Math.max(0,cap-((i*7+j*3)%11));s[sl]=v;tot+=v});
+    days[k]={status:tot===0?'full':tot<cap*2?'few':'ok',slots:s};
+    if(i%9===4){Object.keys(s).forEach(x=>s[x]=0);days[k].status='full'}}
+  return{settings:{slots,maxPeople:6,capacity:cap,demo:true},days};
+}
+
+/* ---------- カレンダー ---------- */
+let viewM=new Date();viewM.setDate(1);
+const minM=new Date(viewM);const maxM=new Date(viewM);maxM.setMonth(maxM.getMonth()+CONFIG.MONTHS_AHEAD-1);
+const MARK={ok:'○',few:'△',full:'×',closed:'休',past:''};
+
+function renderCal(){
+  const c=document.getElementById('cal');const y=viewM.getFullYear(),m=viewM.getMonth();
+  document.getElementById('calTitle').textContent=`${y}年${m+1}月`;
+  document.getElementById('prevM').disabled=viewM<=minM;
+  document.getElementById('nextM').disabled=viewM>=maxM;
+  let h=DOW.map((d,i)=>`<div class="dow ${i==0?'sun':i==6?'sat':''}">${d}</div>`).join('');
+  const first=new Date(y,m,1).getDay(),last=new Date(y,m+1,0).getDate();
+  for(let i=0;i<first;i++)h+='<div class="day empty"></div>';
+  for(let d=1;d<=last;d++){
+    const k=`${y}-${pad(m+1)}-${pad(d)}`;const info=AV.days[k];
+    const st=info?info.status:'past';
+    const can=st==='ok'||st==='few';
+    h+=`<button class="day ${st}" ${can?`data-k="${k}"`:'disabled'} aria-label="${m+1}月${d}日 ${MARK[st]||'受付外'}"><span>${d}</span><span class="st">${MARK[st]||'－'}</span></button>`;
+  }
+  c.innerHTML=h;
+  c.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>openBooking(b.dataset.k));
+  document.getElementById('calMsg').textContent=AV.settings.demo?'※ 現在はデモ表示です（実際の空き状況ではありません）':'○△の日付を押すと、時間を選べます';
+}
+document.getElementById('prevM').onclick=()=>{viewM.setMonth(viewM.getMonth()-1);renderCal()};
+document.getElementById('nextM').onclick=()=>{viewM.setMonth(viewM.getMonth()+1);renderCal()};
+
+/* ---------- 予約モーダル ---------- */
+const B={};
+const modal=document.getElementById('modal'),mBody=document.getElementById('mBody');
+function setStep(n){document.querySelectorAll('.steps i').forEach((e,i)=>e.classList.toggle('on',i<n))}
+function jpDate(k){const d=new Date(k+'T00:00:00');return `${d.getMonth()+1}月${d.getDate()}日（${DOW[d.getDay()]}）`}
+function closeModal(){modal.classList.remove('open');document.body.style.overflow=''}
+modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});
+
+function openBooking(k){
+  Object.keys(B).forEach(x=>delete B[x]);B.date=k;
+  modal.classList.add('open');document.body.style.overflow='hidden';stepTime();
+}
+function stepTime(){
+  setStep(1);document.getElementById('mTitle').textContent=jpDate(B.date)+'　時間を選ぶ';
+  const s=AV.days[B.date].slots;
+  mBody.innerHTML=`<div class="slots">${AV.settings.slots.map(t=>{const r=s[t]||0;
+    return `<button class="slot" data-t="${t}" ${r<=0?'disabled':''}>${t}<small>${r<=0?'満席':r<=2?'残り'+r+'席':'空きあり'}</small></button>`}).join('')}</div>
+    <p class="note-s">ご希望の時間が満席の場合は、お電話でご相談ください。</p>`;
+  mBody.querySelectorAll('.slot:not([disabled])').forEach(b=>b.onclick=()=>{B.time=b.dataset.t;stepForm()});
+}
+function stepForm(){
+  setStep(2);document.getElementById('mTitle').textContent='お客様情報';
+  const remain=AV.days[B.date].slots[B.time];const max=Math.min(remain,AV.settings.maxPeople);
+  mBody.innerHTML=`
+    <p style="font-family:var(--serif)">${jpDate(B.date)} ${B.time}〜</p>
+    <form id="f" novalidate>
+      <div class="row2">
+        <label class="f">人数<span class="req">必須</span>
+          <select name="people">${Array.from({length:max},(_,i)=>`<option ${B.people==i+1?'selected':''}>${i+1}</option>`).join('')}</select></label>
+        <label class="f">コース
+          <select name="course">${['当日決める','旬の会席','おまかせ','特選'].map(c=>`<option ${B.course==c?'selected':''}>${c}</option>`).join('')}</select></label>
+      </div>
+      <label class="f">お名前<span class="req">必須</span><input name="name" autocomplete="name" value="${B.name||''}" placeholder="長崎 太郎"></label>
+      <label class="f">電話番号<span class="req">必須</span><input name="tel" type="tel" autocomplete="tel" value="${B.tel||''}" placeholder="090-0000-0000"></label>
+      <label class="f">メールアドレス<span class="req">必須</span><input name="email" type="email" autocomplete="email" value="${B.email||''}" placeholder="確認メールをお送りします"></label>
+      <label class="f">アレルギー・ご要望など<textarea name="note" placeholder="例）記念日です／えびアレルギーがあります">${B.note||''}</textarea></label>
+      <p class="err" id="err"></p>
+      <div class="actions"><button type="button" class="btn btn-line" onclick="stepTime()">戻る</button><button class="btn btn-shu">確認へ</button></div>
+    </form>`;
+  document.getElementById('f').onsubmit=e=>{
+    e.preventDefault();const fd=Object.fromEntries(new FormData(e.target));Object.assign(B,fd);B.people=+fd.people;
+    const er=[];if(!fd.name.trim())er.push('お名前');if(!/^[0-9０-９\-－ ]{10,}$/.test(fd.tel))er.push('電話番号');
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(fd.email))er.push('メールアドレス');
+    if(er.length){document.getElementById('err').textContent=er.join('・')+'を正しく入力してください';return}
+    stepConfirm();
+  };
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function stepConfirm(){
+  setStep(3);document.getElementById('mTitle').textContent='内容の確認';
+  mBody.innerHTML=`<table class="confirm-tbl">
+    <tr><th>日時</th><td>${jpDate(B.date)} ${B.time}〜</td></tr>
+    <tr><th>人数</th><td>${B.people}名</td></tr><tr><th>コース</th><td>${esc(B.course)}</td></tr>
+    <tr><th>お名前</th><td>${esc(B.name)} 様</td></tr><tr><th>電話</th><td>${esc(B.tel)}</td></tr>
+    <tr><th>メール</th><td>${esc(B.email)}</td></tr><tr><th>ご要望</th><td>${esc(B.note||'なし')}</td></tr></table>
+    <p class="note-s">キャンセル・変更は、お電話（${CONFIG.TEL}）でご連絡ください。</p>
+    <p class="err" id="err"></p>
+    <div class="actions"><button class="btn btn-line" onclick="stepForm()">修正する</button><button class="btn btn-shu" id="sendBtn">この内容で予約する</button></div>`;
+  document.getElementById('sendBtn').onclick=submitBooking;
+}
+async function submitBooking(){
+  const btn=document.getElementById('sendBtn');btn.disabled=true;btn.textContent='送信中…';
+  try{
+    let res;
+    if(!CONFIG.GAS_URL){await new Promise(r=>setTimeout(r,700));res={ok:true,id:'DEMO-0001'};
+      AV.days[B.date].slots[B.time]-=B.people;}
+    else{const r=await fetch(CONFIG.GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({action:'reserve',date:B.date,time:B.time,people:B.people,course:B.course,name:B.name,tel:B.tel,email:B.email,note:B.note||''})});
+      res=await r.json();}
+    if(!res.ok)throw new Error(res.error||'送信できませんでした');
+    setStep(4);document.getElementById('mTitle').textContent='ご予約を承りました';
+    mBody.innerHTML=`<div class="done"><p class="big">承</p>
+      <p style="margin-top:16px;font-family:var(--serif)">${jpDate(B.date)} ${B.time}〜　${B.people}名様</p>
+      <p style="margin-top:12px;font-size:.9rem">${esc(B.email)} に確認メールをお送りしました。<br>ご来店を心よりお待ちしております。</p>
+      <p class="note-s">予約番号：${esc(res.id)}${AV.settings.demo?'（デモのため、メールは届きません）':''}</p>
+      <div class="actions"><button class="btn btn-shu" onclick="closeModal()">閉じる</button></div></div>`;
+    await refresh();
+  }catch(e){
+    document.getElementById('err').textContent=e.message+'。お手数ですがお電話でご予約ください（'+CONFIG.TEL+'）';
+    btn.disabled=false;btn.textContent='この内容で予約する';
+    if(CONFIG.GAS_URL)refresh();
+  }
+}
+async function refresh(){try{if(CONFIG.GAS_URL)await loadAvailability();renderCal()}catch(e){}}
+
+loadAvailability().then(renderCal).catch(()=>{
+  document.getElementById('calMsg').textContent='空き状況を読み込めませんでした。お電話でお問い合わせください。';
+});
+</script>
+</body>
+</html>

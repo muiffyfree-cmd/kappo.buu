@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+# 仮ドメインの間は Disallow しない（noindex を読ませるため）。sitemap.xml も出さない

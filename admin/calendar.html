@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- @include admin-head -->
+<title>予約カレンダー｜割烹 舞ぅ 管理画面</title>
+</head>
+<body>
+<!-- @include admin-header -->
+<main class="a-main" id="main" hidden>
+  <h1 class="a-title">予約カレンダー</h1>
+  <section class="panel" aria-label="月のカレンダー">
+    <div class="mnav">
+      <button type="button" id="prevM" aria-label="前の月">‹</button>
+      <h2 id="mTitle" aria-live="polite">----年--月</h2>
+      <button type="button" id="nextM" aria-label="次の月">›</button>
+    </div>
+    <div class="acal" id="acal"></div>
+    <p class="muted" style="margin-top:8px">各日：昼・夜の予約人数と、いちばん空いている時間の残席。日付を押すと下に一覧が出ます。</p>
+  </section>
+  <section class="panel" id="dayPanel" aria-labelledby="dayTitle" hidden>
+    <h2 id="dayTitle" tabindex="-1"></h2>
+    <div id="dayList"></div>
+  </section>
+</main>
+<script type="module" src="/js/admin/calendar.js"></script>
+</body>
+</html>

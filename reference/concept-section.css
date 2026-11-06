@@ -1,0 +1,80 @@
+/* =========================================================
+   こだわりセクション（白 × 金箔 × 円形写真 × SVG曲線）
+   いただいた luxury-section をベースに、以下を修正
+   ・金色の文字を読みやすい濃さに（WCAG AA 4.5:1 以上）
+   ・曲線が横に伸びても線の太さが変わらないように
+   ・スマホの本文 11px → 13px
+   ・書体をサイト共通の明朝（Shippori Mincho）に統一
+   ========================================================= */
+
+:root{
+  --paper:      #fffdf8;  /* 白の部分の新しい背景（生成り） */
+  --gold-line:  #bca369;  /* 線・枠（装飾のみ） */
+  --gold-text:  #8a6f35;  /* 金色の文字（元の #a48a4e はコントラスト比 3.3 で不足 → 4.7） */
+  --ink:        #28211c;  /* 見出し */
+  --ink-soft:   #5c554a;  /* 本文（コントラスト比 7.3） */
+}
+
+/* 背景（.bg-paper / .gold-washi-bg）は backgrounds.css に移動 */
+
+/* ---------- こだわりセクション ---------- */
+.luxury-section{ padding:80px 24px; overflow:hidden; font-family:var(--serif); color:var(--ink); }
+
+.luxury-heading{ text-align:center; margin-bottom:55px; }
+.luxury-heading-en{ font-size:12px; letter-spacing:.3em; color:var(--gold-text); }
+.luxury-heading-title{ margin:14px 0 20px; font-size:32px; font-weight:500; letter-spacing:.16em; line-height:1.6; }
+.luxury-heading-line{ width:66px; height:1px; margin:0 auto; background:var(--gold-line); }
+
+.luxury-list{ max-width:1100px; margin:0 auto; display:flex; flex-direction:column; }
+
+.luxury-item{ display:grid; grid-template-columns:160px minmax(0,1fr); align-items:center; column-gap:40px; min-height:190px; }
+.luxury-item.right-image{ grid-template-columns:minmax(0,1fr) 160px; }
+.luxury-item.right-image .circle-photo{ grid-column:2; grid-row:1; }
+.luxury-item.right-image .item-content{ grid-column:1; grid-row:1; }
+
+.circle-photo{
+  width:160px; height:160px; border-radius:50%; overflow:hidden;
+  border:4px solid #fff; outline:1px solid #d5c5a2; background:#f2efe8;
+  box-shadow:0 7px 16px rgba(49,38,22,.13), 0 14px 28px rgba(49,38,22,.05);
+}
+.circle-photo img{ display:block; width:100%; height:100%; object-fit:cover; }
+
+.item-content{ min-width:0; padding:8px 0; }
+.item-number{ margin-bottom:7px; font-size:12px; letter-spacing:.12em; color:var(--gold-text); }
+.item-title{ margin:0 0 14px; font-size:26px; font-weight:600; line-height:1.5; letter-spacing:.07em; }
+.item-text{ max-width:760px; margin:0; font-family:var(--sans); font-size:15px; line-height:2; letter-spacing:.03em; color:var(--ink-soft); overflow-wrap:anywhere; }
+
+.curve-divider{ height:64px; margin:8px 0 12px; }
+.curve-divider svg{ display:block; width:100%; height:100%; overflow:visible; }
+.curve-divider path{
+  fill:none; stroke:#34302a; stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round;
+  vector-effect:non-scaling-stroke;  /* preserveAspectRatio="none" でも線の太さを一定に */
+}
+
+.luxury-footer{ margin-top:55px; text-align:center; }   /* 「詳細はこちらから」を置く */
+
+@media (max-width:900px){
+  .luxury-section{ padding:65px 28px; }
+  .luxury-heading-title{ font-size:28px; }
+  .luxury-item{ grid-template-columns:130px minmax(0,1fr); column-gap:26px; min-height:165px; }
+  .luxury-item.right-image{ grid-template-columns:minmax(0,1fr) 130px; }
+  .circle-photo{ width:130px; height:130px; }
+  .item-title{ font-size:22px; }
+  .item-text{ font-size:14px; }
+  .curve-divider{ height:54px; }
+}
+@media (max-width:600px){
+  .luxury-section{ padding:45px 18px; }
+  .luxury-heading{ margin-bottom:30px; }
+  .luxury-heading-en{ font-size:11px; }
+  .luxury-heading-title{ font-size:23px; letter-spacing:.12em; }
+  .luxury-item{ grid-template-columns:96px minmax(0,1fr); column-gap:14px; min-height:138px; }
+  .luxury-item.right-image{ grid-template-columns:minmax(0,1fr) 96px; }
+  .circle-photo{ width:96px; height:96px; }
+  .item-content{ padding:4px 0; }
+  .item-number{ margin-bottom:5px; font-size:11px; letter-spacing:.08em; }
+  .item-title{ margin-bottom:9px; font-size:17px; }
+  .item-text{ font-size:13px; line-height:1.9; letter-spacing:0; }   /* 元の 11px は小さすぎるため 13px */
+  .curve-divider{ height:48px; margin:2px 0 8px; }
+  .luxury-footer{ margin-top:30px; }
+}

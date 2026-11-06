@@ -1,0 +1,34 @@
+<a class="skip" href="#main">本文へスキップ</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-tel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2"/></symbol>
+  <symbol id="i-ig" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+</svg>
+
+<header class="site-header">
+  <a href="/" class="site-header__logo"><img src="/assets/img/logo-white.png" alt="割烹 舞ぅ（トップへ）" width="44" height="44"></a>
+  <nav class="site-nav" id="siteNav" aria-label="メインメニュー">
+    <ul>
+      <li><a href="/news.html">お知らせ<small>NEWS</small></a></li>
+      <li><a href="/concept.html">こだわり<small>CONCEPT</small></a></li>
+      <li><a href="/menu.html">お品書き<small>MENU</small></a></li>
+      <li><a href="/reserve.html">空き状況<small>RESERVE</small></a></li>
+      <li><a href="/#info">店舗情報<small>SHOP INFO</small></a></li>
+    </ul>
+  </nav>
+  <div class="site-header__cta">
+    <a class="site-header__tel" href="tel:0958238510" data-tel><b data-tel-text>095-823-8510</b><small>受付 <span data-tel-hours>10:00–22:00（日曜休）</span><!-- TODO 受付時間 --></small></a>
+    <a href="/reserve.html" class="btn btn--white">ご予約</a>
+    <button class="site-header__menu" type="button" aria-expanded="false" aria-controls="siteNav" aria-label="メニューを開く">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+  </div>
+</header>
+
+<aside class="side-rail" aria-label="ご予約・お問い合わせ">
+  <div class="side-rail__today" id="railToday" aria-live="polite"><span class="lbl">本日</span><span class="row">…</span></div>
+  <a href="/reserve.html" class="is-main">空き状況・ご予約</a>
+  <a href="tel:0958238510" data-tel><svg aria-hidden="true"><use href="#i-tel"/></svg>お電話</a>
+  <a href="https://www.instagram.com/kappou_buu/" data-ig target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-ig"/></svg>Instagram</a>
+</aside>
