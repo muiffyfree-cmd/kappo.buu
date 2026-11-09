@@ -1,5 +1,6 @@
-# 割烹 舞ぅ 公式サイト 制作指示書 v2.2（Claude Code 用）
+# 割烹 舞ぅ 公式サイト 制作指示書 v2.3（Claude Code 用）
 
+> v2.3：予約メール（予約完了・キャンセル・店への通知）を自動送信。文面は管理画面で編集
 > v2.2：こだわりを円形写真＋曲線のデザインに／白の部分を生成り＋金の粒に／ご挨拶・お品書き・店舗情報を和紙＋金箔に／お品書きを Supabase で管理（管理画面から編集）
 > v2 の変更点：配色を**白と黒**に変更／トップの各セクションに**「詳細はこちらから」→ 下層ページ**／**お知らせをヒーロー直下**へ移動／予約管理を **GAS → Supabase** に変更し、**管理画面（/admin）**を追加
 
@@ -36,12 +37,13 @@ npm run dev               # → http://localhost:3100
 
 | 手順 | 内容 |
 |---|---|
-| 1 | `supabase/migrations/0001_init.sql` を適用（`supabase db push` か SQL Editor に貼る）※ローカルの PostgreSQL 16 で動作確認済み |
+| 1 | `supabase/migrations/0001_init.sql` → `0002_menu.sql` → `0003_mail.sql` の順に適用（SQL Editor なら `supabase/sql-editor/01_setup.sql` → `04_mail.sql`）（`supabase db push` か SQL Editor に貼る）※ローカルの PostgreSQL 16 で動作確認済み |
 | 2 | Authentication → Providers で Email を有効化、**Sign up を無効化** |
 | 3 | 店のユーザーを Authentication → Users から招待 → SQL Editor で `insert into admin_users(user_id) values ('<uuid>');` |
-| 4 | `supabase functions deploy reservation-mail` |
-| 5 | `supabase secrets set RESEND_API_KEY=... MAIL_FROM="割烹 舞ぅ <yoyaku@ドメイン>" SHOP_EMAIL=... SHOP_TEL=095-823-8510 WEBHOOK_SECRET=...` |
-| 6 | Database → Webhooks：`reservations` の INSERT → `reservation-mail` 関数、ヘッダー `x-webhook-secret` に同じ値 |
+| 4 | `supabase functions deploy reservation-mail --no-verify-jwt`（`_shared/mail-render.js` も一緒に送られる） |
+| 5 | `supabase secrets set RESEND_API_KEY=... MAIL_FROM="割烹 舞ぅ <yoyaku@認証済みドメイン>" WEBHOOK_SECRET=<長いランダム文字列>`（店の通知先メールは `mail_settings`、電話・受付時間などは `settings`。どちらも管理画面の「メール」で設定） |
+| 6 | Database → Webhooks：`reservations` の **INSERT と UPDATE** → Supabase Edge Function `reservation-mail`、HTTPヘッダー `x-webhook-secret` に5と同じ値 |
+| 7 | 管理画面の「メール」で店の通知先メールとサイトのURLを入れ、テスト送信で届くことを確認 |
 
 ---
 
@@ -63,6 +65,7 @@ kappo-buu/
 │   ├─ reservation.html    予約の詳細・編集・電話予約の新規登録
 │   ├─ closed.html         臨時休業日
 │   ├─ menu.html           お品書きの編集
+│   ├─ mail.html           予約メールの文面・テスト送信・送信履歴
 │   ├─ news.html           お知らせの編集
 │   └─ settings.html       席数・時間枠・定休曜日など
 ├─ css/  style.css（reference/buu-design.css v2 がベース） admin.css
@@ -71,7 +74,10 @@ kappo-buu/
 ├─ supabase/
 │   ├─ migrations/0001_init.sql          テーブル・RLS・関数（作成済み）
 │   ├─ migrations/0002_menu.sql          お品書き・写真の保存先（作成済み）
-│   └─ functions/reservation-mail/index.ts  確認メール（作成済み）
+│   ├─ migrations/0003_mail.sql          メール文面・送信履歴・店の連絡先（作成済み）
+│   ├─ functions/reservation-mail/index.ts  送信の判断（作成済み）
+│   ├─ functions/_shared/mail-render.js    文面の差し込み・HTML化（Edge Function と管理画面のプレビューで共通。js/mail-render.js から再エクスポート）
+│   └─ sql-editor/                       SQL Editor に貼る版（01_setup＝0001＋0002、04_mail＝0003）
 └─ reference/              buu-design.css（v2・白黒）、prototype-index.html（1稿目）
 ```
 
@@ -268,6 +274,49 @@ const { data: code, error } = await supabase.rpc('create_reservation', {
 
 ---
 
+## 11. 予約メール（v2.3）
+
+### いつ・誰に送るか（`supabase/functions/reservation-mail/index.ts` で実装済み）
+
+| きっかけ | 送る文面 | 宛先 | 条件 |
+|---|---|---|---|
+| 予約が登録された（INSERT） | `customer_confirmed` 予約完了 | お客様 | メールアドレスあり＋`notify_customer = true` |
+| 同上 | `shop_new` 新しい予約の通知 | 店（`mail_settings.shop_email`） | **Web予約のときだけ**（店が自分で入れた電話・DM予約は通知しない） |
+| 状態が「キャンセル」に変わった（UPDATE） | `customer_cancelled` キャンセル完了 | お客様 | 同上 |
+
+- 同じ予約に同じ文面は**二度送らない**（`mail_log` に先に「送信中」の行を入れて取り合う。失敗した分は再送できる）。送信結果（送信済み／失敗）はすべて `mail_log` に残る
+- お客様へのメールの返信先（reply_to）は店のメール。お客様が返信すると店に届く
+- 文面の `■` で始まる行は、HTMLメールで見出し（金の下線）になる。HTML版とテキスト版の両方を送る
+
+### 差し込みできる項目
+
+| 書き方 | 中身 | 書き方 | 中身 |
+|---|---|---|---|
+| `{{name}}` | お名前 | `{{shop_tel}}` | 店の電話 |
+| `{{code}}` | 予約番号 | `{{tel_hours}}` | 電話の受付時間 |
+| `{{date}}` | 2026年11月14日（土） | `{{cancel_policy}}` | キャンセル規定 |
+| `{{service}}` | 昼の部／夜の部 | `{{address}}` `{{access}}` | 住所・アクセス |
+| `{{time}}` | 18:30 | `{{map_url}}` | Googleマップ（HTMLでは「Googleマップで開く」と表示） |
+| `{{people}}` | 人数 | `{{site_url}}` `{{reserve_url}}` | サイト・予約ページ |
+| `{{course}}` | コース（未選択なら「当日お決めいただけます」） | `{{service_charge_line}}` | 夜のコースを選んだときだけ「・サービス料10%」の1行 |
+| `{{note}}` | ご要望 | `{{tel}}` `{{email}}` `{{source}}` | 電話・メール・経路（店向け） |
+| `{{booked_people}}` `{{remaining}}` | その部の予約人数・残席（店向け） | `{{admin_url}}` | 管理画面の該当予約 |
+
+### 管理画面：admin/mail.html（新規）
+
+| 機能 | 内容 |
+|---|---|
+| 文面の編集 | 3つの文面それぞれの件名・本文・送る／送らない。右側に差し込み項目の一覧（クリックでカーソル位置に挿入） |
+| プレビュー | 入力中の文面を、サンプルの予約で差し込んだ**HTMLメールの見た目**で表示（Edge Function と同じ `supabase/functions/_shared/mail-render.js` を `js/mail-render.js` 経由で使う） |
+| 書き間違いの警告 | 一覧にない `{{〇〇}}` があれば赤字で警告し、保存できるが確認ダイアログを出す |
+| テスト送信 | 宛先を入れて送信 → Edge Function に `{ type: "TEST", template_key, template（編集中の内容）, to }` を管理者のJWT付きでPOST |
+| 店の情報 | `mail_settings` の店の通知先メール（`settings` は公開側から読めるため分けた）／`settings` の電話・受付時間・住所・アクセス・サイトURL・キャンセル規定 |
+| 送信履歴 | `mail_log` を新しい順に（日時・予約番号・文面・宛先・状態・エラー） |
+
+予約の詳細画面（admin/reservation.html）には、その予約の送信履歴と「確認メールを送る」チェック（`notify_customer`、電話予約の新規登録では初期値オフ）を付ける。
+
+---
+
 ## 9. SEO・その他
 
 | 項目 | 内容 |
@@ -294,4 +343,6 @@ const { data: code, error } = await supabase.rpc('create_reservation', {
 - [ ] 管理画面で電話予約を登録・キャンセルすると、公開カレンダーの残席が変わる
 - [ ] PC（1280px）とスマホ（390px）のスクショで崩れがない
 - [ ] 管理画面でお品書きを編集・お休みにすると、menu.html とトップに即反映される（味彩御膳は初期状態で非表示）
+- [ ] Web予約でお客様と店にメールが届く／管理画面でキャンセルするとお客様にキャンセルのメールが届く／同じメールが二度届かない
+- [ ] admin/mail.html で文面を編集・プレビュー・テスト送信できる
 - [ ] TODO の一覧を README.md に書き出す

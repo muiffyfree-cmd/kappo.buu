@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- @include admin-head -->
+<title>予約メール｜割烹 舞ぅ 管理画面</title>
+</head>
+<body>
+<!-- @include admin-header -->
+<main class="a-main a-main--wide" id="main" hidden>
+  <h1 class="a-title">予約メール</h1>
+  <p class="muted" style="margin:-6px 4px 12px">予約が入ったとき・キャンセルしたときに自動で送るメールです。保存した文面は次のメールから使われます。</p>
+
+  <div class="seg seg--tabs" role="radiogroup" aria-label="文面を選ぶ" id="tplTabs"></div>
+
+  <div class="mail-grid">
+    <form class="panel" id="f" novalidate>
+      <h2 id="tplTitle">文面</h2>
+      <p class="muted" id="tplWhen"></p>
+      <div class="checks" style="margin:10px 0 4px"><label><input type="checkbox" name="enabled">このメールを送る</label></div>
+      <label class="fld">件名<input name="subject" maxlength="300" autocomplete="off" required></label>
+      <label class="fld">本文<span class="hint">「■」で始まる行は見出しになります</span><textarea name="body" rows="18" maxlength="10000" class="mono" required></textarea></label>
+      <div class="warn" id="unknownWarn" role="alert" hidden></div>
+      <details class="vars" open>
+        <summary>差し込みできる項目<span class="hint">押すとカーソルの位置に入ります</span></summary>
+        <ul id="varList"></ul>
+      </details>
+      <div class="warn" id="warn" hidden></div>
+      <p class="msg" id="msg" role="alert"></p>
+      <div class="btns">
+        <button type="button" class="b b--line" id="resetBtn">初期の文面に戻す</button>
+        <button type="submit" class="b b--black" id="saveBtn">保存する</button>
+      </div>
+    </form>
+
+    <section class="panel" aria-labelledby="pvTitle">
+      <h2 id="pvTitle">プレビュー<small>サンプルの予約で表示</small></h2>
+      <p class="pv-subject"><span class="muted">件名</span><b id="pvSubject"></b></p>
+      <iframe id="pvFrame" class="pv-frame" title="メールのプレビュー" sandbox="allow-popups allow-popups-to-escape-sandbox"></iframe>
+      <form class="test-send" id="testForm" novalidate>
+        <label class="fld">テスト送信の宛先<span class="hint">編集中（保存前）の文面で送ります。件名に［テスト］が付きます</span>
+          <input name="to" type="email" inputmode="email" autocomplete="email" required maxlength="200"></label>
+        <p class="msg" id="testMsg" role="status"></p>
+        <div class="btns"><button type="submit" class="b" id="testBtn">テスト送信</button></div>
+      </form>
+    </section>
+  </div>
+
+  <form class="panel" id="shopForm" novalidate>
+    <h2>店の情報<small>メールに差し込まれます</small></h2>
+    <label class="fld">店の通知先メール<span class="hint">Web予約が入ると、ここに通知が届きます。お客様が返信したときの宛先にもなります（サイトには表示されません）</span>
+      <input name="shop_email" type="email" inputmode="email" autocomplete="off" maxlength="200"></label>
+    <div class="row">
+      <label class="fld">電話<input name="shop_tel" type="tel" maxlength="30" required></label>
+      <label class="fld">電話の受付時間<input name="tel_hours" maxlength="60"></label>
+    </div>
+    <label class="fld">住所<input name="shop_address" maxlength="120" required></label>
+    <label class="fld">アクセス<input name="shop_access" maxlength="120"></label>
+    <label class="fld">サイトのURL<span class="hint">例：https://kappo-buu.jp（予約ページ・管理画面へのリンクに使います）</span>
+      <input name="site_url" type="url" inputmode="url" maxlength="200" required></label>
+    <label class="fld">キャンセル規定<textarea name="cancel_policy" rows="2" maxlength="500"></textarea></label>
+    <p class="msg" id="shopMsg" role="alert"></p>
+    <div class="btns"><button class="b b--black" type="submit">店の情報を保存</button></div>
+  </form>
+
+  <section class="panel" aria-labelledby="logTitle">
+    <h2 id="logTitle">送信履歴<span class="sp" style="flex:1"></span><button type="button" class="b b--sm b--line" id="logReload">更新</button></h2>
+    <div id="log"><p class="loading">読み込み中…</p></div>
+  </section>
+</main>
+<script type="module" src="/js/admin/mail.js"></script>
+</body>
+</html>

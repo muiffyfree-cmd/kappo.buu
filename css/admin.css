@@ -27,7 +27,7 @@ a{color:inherit}
 
 /* ---------- ナビ（スマホ：下に固定／PC：上） ---------- */
 .a-nav{position:fixed;inset:auto 0 0 0;z-index:30;background:var(--black);padding-bottom:env(safe-area-inset-bottom)}
-.a-nav ul{display:grid;grid-template-columns:repeat(7,1fr);list-style:none;height:var(--nav-h)}
+.a-nav ul{display:grid;grid-template-columns:repeat(8,1fr);list-style:none;height:var(--nav-h)}
 .a-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:100%;color:rgba(255,255,255,.75);text-decoration:none;font-size:.62rem;letter-spacing:0;white-space:nowrap}
 .a-nav a svg{width:22px;height:22px}
 .a-nav a[aria-current]{color:var(--black);background:var(--white);font-weight:500}
@@ -183,3 +183,40 @@ body:has(.login){padding-bottom:0}
 .photo .none{width:120px;height:90px;display:grid;place-items:center;background:var(--off);color:var(--gray);font-size:.75rem;border:1px dashed #ccc}
 .file-btn{position:relative;overflow:hidden}
 .file-btn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+/* ---------- 予約メール（admin/mail.html） ---------- */
+.a-main--wide{max-width:1180px}
+.mail-grid{display:grid;gap:12px;align-items:start}
+@media (min-width:1000px){.mail-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.mail-grid>.panel{margin-bottom:0}.mail-grid{margin-bottom:12px}}
+.seg--tabs{display:flex;flex-wrap:wrap;margin:0 0 12px}
+.seg--tabs label{flex:1 1 auto;justify-content:center;text-align:center}
+.seg--tabs small{font-size:.7rem;margin-left:2px}
+.seg--tabs .dirty{font-size:.6rem;margin-left:4px;vertical-align:super}
+.fld textarea.mono{font-family:ui-monospace,"BIZ UDGothic","Noto Sans JP",monospace;font-size:.88rem;line-height:1.75;min-height:22em}
+.vars{margin:12px 0 4px;border:1px solid var(--line);background:var(--white)}
+.vars summary{cursor:pointer;padding:10px 12px;font-size:.9rem;font-weight:500;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.vars summary .hint{font-size:.75rem;color:var(--gray);font-weight:400}
+.vars ul{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:4px;padding:0 8px 10px}
+.var-chip{display:flex;flex-direction:column;align-items:flex-start;width:100%;min-height:44px;padding:6px 8px;border:1px solid var(--line);background:var(--off);font:inherit;text-align:left;cursor:pointer;color:var(--black)}
+.var-chip:hover{border-color:var(--black)}
+.var-chip code{font-size:.8rem}
+.var-chip span{font-size:.72rem;color:var(--gray);line-height:1.4}
+.warn code,.mlog code{font-size:.85em}
+.pv-subject{display:flex;flex-direction:column;gap:2px;margin:0 0 8px;padding:8px 10px;background:var(--white);border:1px solid var(--line);font-size:.9rem;word-break:break-all}
+.pv-subject .muted{font-size:.72rem}
+.pv-frame{display:block;width:100%;height:640px;border:1px solid var(--line);background:#f4f1ea}
+@media (max-width:600px){.pv-frame{height:520px}}
+.test-send{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.mlog{list-style:none}
+.mlog li{display:flex;gap:10px;align-items:flex-start;padding:10px 2px;border-top:1px solid var(--line)}
+.mlog li:first-child{border-top:0}
+.mlog .st{flex:none;min-width:4.8em;text-align:center;font-size:.72rem;padding:2px 6px;border:1px solid var(--black)}
+.mlog .is-sent .st{background:var(--black);color:var(--white)}
+.mlog .is-failed .st{border-style:dashed;font-weight:700}
+.mlog .main{display:flex;flex-direction:column;min-width:0;font-size:.85rem}
+.mlog .main span{color:var(--gray);word-break:break-all}
+.mlog .main .err{color:var(--black);font-size:.75rem;font-family:ui-monospace,monospace}
+.checks .hint{font-size:.75rem;color:var(--gray);font-weight:400}
+.checks label:has(input:disabled){opacity:.6;cursor:default}
+/* ナビが8つになったので、狭い画面では文字を少し小さく（5文字のラベルが隣とくっつかないように） */
+@media (max-width:420px){.a-nav a{font-size:.56rem}}

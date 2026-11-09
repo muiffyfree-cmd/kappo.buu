@@ -7,6 +7,8 @@ import { DEMO, getSession, isAdmin, signOut } from '../api.js';
 
 export const STATUS = { booked: '予約', visited: '来店済', cancelled: 'キャンセル', no_show: '無断キャンセル' };
 export const SOURCE = { web: 'Web', phone: '電話', dm: 'Instagram DM', walkin: '来店', other: 'その他' };
+export const MAIL_STATUS = { sending: '送信中', sent: '送信済み', failed: '失敗' };
+export const MAIL_TEMPLATE = { customer_confirmed: '予約完了', customer_cancelled: 'キャンセル完了', shop_new: '店への通知' };
 export const ACTIVE = s => s === 'booked' || s === 'visited';
 
 /** ログインと権限を確認してからページを表示する */

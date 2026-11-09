@@ -4,6 +4,7 @@
    localStorage に保存するので、管理画面での変更が公開側のカレンダーにも反映される。
    ========================================================= */
 import { addDays, parseDay, todayKey } from './util.js';
+import { DEFAULT_TEMPLATES, buildVars, isUndecidedCourse, render, sampleReservation, unknownKeys } from './mail-render.js';
 
 const KEY = 'buu-demo-v4';
 const SESSION = 'buu-demo-session';
@@ -37,7 +38,12 @@ const DEFAULT_SETTINGS = {
   lunch_stay_min: 90, dinner_stay_min: 150, cutoff_hours: 3, booking_days: 60, few_threshold: 3,
   menu_note: '※ 昼・夜・甘味メニューは仕入れ状況によりお品書きを変更する場合がございます。',
   course_service_note: 'コース料理はコース金額の10%のサービス料金を頂戴します。',
+  // 0003_mail.sql と同じ（メールに差し込む店の情報）
+  shop_tel: '095-823-8510', tel_hours: '10:00〜22:00（日曜定休）', shop_address: '長崎県長崎市銅座町3-28',
+  shop_access: '西浜町電停・新地中華街電停より徒歩1分', site_url: 'http://localhost:3100',
+  cancel_policy: 'キャンセル料：前日はコース料金の50%、当日・ご連絡なしはコース料金の100%を頂戴いたします。',
 };
+const seedMail = () => ({ shop_email: 'shop@example.com', templates: structuredClone(DEFAULT_TEMPLATES), log: [] });
 
 const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'id-' + Math.random().toString(36).slice(2));
@@ -90,13 +96,17 @@ function seed() {
     { id: 1, published_on: addDays(t, -20), tag: '休業', title: '臨時休業のお知らせ', body: '仕入れのため、臨時休業をいただく日があります。空き状況のカレンダーでご確認ください。', is_published: true },
     { id: 4, published_on: addDays(t, 1), tag: 'お知らせ', title: '（下書き）年末年始の営業について', body: '', is_published: false },
   ];
-  return { settings: { ...DEFAULT_SETTINGS }, closed_days, reservations, news, newsSeq: 5, menu: seedMenu(), seededOn: t };
+  return { settings: { ...DEFAULT_SETTINGS }, closed_days, reservations, news, newsSeq: 5, menu: seedMenu(), mail: seedMail(), seededOn: t };
 }
 
 function load() {
   try {
     const s = JSON.parse(localStorage.getItem(KEY));
-    if (s && s.settings) return s;
+    if (s && s.settings) {
+      // v2.3 より前に保存されたデモデータには、メールの情報を足す
+      if (!s.mail) { s.mail = seedMail(); s.settings = { ...DEFAULT_SETTINGS, ...s.settings }; save(s); }
+      return s;
+    }
   } catch { /* 壊れていたら作り直す */ }
   const s = seed();
   save(s);
@@ -158,9 +168,10 @@ export async function createReservation(p) {
   const r = {
     id: uid(), code: genCode(), day: p.day, service: p.service, slot: p.time, people: p.people,
     course: p.course || '', name: p.name.trim(), tel: p.tel.trim(), email: p.email.trim(), note: (p.note || '').trim(),
-    status: 'booked', source: 'web', staff_memo: '', created_at: nowIso(), updated_at: nowIso(),
+    status: 'booked', source: 'web', staff_memo: '', notify_customer: true, created_at: nowIso(), updated_at: nowIso(),
   };
   s.reservations.push(r);
+  demoMailOnInsert(s, r);
   save(s);
   return r.code;
 }
@@ -203,10 +214,13 @@ export async function saveReservation(data) {
   if (data.id) {
     r = s.reservations.find(x => x.id === data.id);
     if (!r) fail('NOT_FOUND');
+    const before = r.status;
     Object.assign(r, data, { updated_at: nowIso() });
+    if (before !== 'cancelled' && r.status === 'cancelled') demoMail(s, r, 'customer_cancelled');
   } else {
-    r = { id: uid(), code: genCode(), status: 'booked', staff_memo: '', created_at: nowIso(), updated_at: nowIso(), ...data };
+    r = { id: uid(), code: genCode(), status: 'booked', staff_memo: '', notify_customer: true, created_at: nowIso(), updated_at: nowIso(), ...data };
     s.reservations.push(r);
+    demoMailOnInsert(s, r);
   }
   save(s);
   return r;
@@ -251,4 +265,60 @@ export async function deleteMenuItem(id) { const s = load(); s.menu = s.menu.fil
 /** デモでは画像を data URL のまま保存する（本番は Storage） */
 export async function uploadMenuImage(blob) {
   return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob); });
+}
+
+
+/* ---------- 予約メール（デモ：実際には送らず、送信履歴にだけ残す。Edge Function と同じ条件） ---------- */
+function mailVars(s, r) {
+  const course = String(r.course || '').trim();
+  const isCourse = r.service === 'dinner' && !isUndecidedCourse(course) && s.menu.some(m => m.category === 'dinner' && course.includes(m.name));
+  const booked = s.reservations.filter(x => x.day === r.day && x.service === r.service && (x.status === 'booked' || x.status === 'visited'))
+    .reduce((a, x) => a + x.people, 0);
+  return buildVars(r, s.settings, { isCourse, bookedPeople: booked, remaining: Math.max(0, remaining(s, r.day, r.service, r.slot)) });
+}
+function demoMail(s, r, key, to = r.email) {
+  const tpl = s.mail.templates.find(t => t.key === key);
+  if (!tpl?.enabled || !to) return;
+  if (key !== 'shop_new' && r.notify_customer === false) return;
+  if (s.mail.log.some(l => l.reservation_id === r.id && l.template_key === key && l.status === 'sent')) return;
+  render(tpl, mailVars(s, r)); // 文面が作れることだけ確かめる
+  s.mail.log.unshift({ id: uid(), reservation_id: r.id, template_key: key, to_email: to, status: 'sent', provider_id: 'demo',
+    error: null, created_at: nowIso(), reservations: { code: r.code, name: r.name } });
+  s.mail.log = s.mail.log.slice(0, 300);
+}
+function demoMailOnInsert(s, r) {
+  if (r.status !== 'booked') return;
+  demoMail(s, r, 'customer_confirmed');
+  if (r.source === 'web' && s.mail.shop_email) demoMail(s, r, 'shop_new', s.mail.shop_email);
+}
+const SHOP_KEYS = ['shop_tel', 'tel_hours', 'shop_address', 'shop_access', 'site_url', 'cancel_policy'];
+export async function listMailTemplates() { return structuredClone(load().mail.templates); }
+export async function saveMailTemplate(t) {
+  const s = load();
+  const cur = s.mail.templates.find(x => x.key === t.key);
+  if (!cur) fail('NOT_FOUND');
+  Object.assign(cur, t, { updated_at: nowIso() });
+  save(s);
+}
+export async function getMailShop() {
+  const s = load();
+  return { shop_email: s.mail.shop_email, ...Object.fromEntries(SHOP_KEYS.map(k => [k, s.settings[k] ?? ''])), course_service_note: s.settings.course_service_note };
+}
+export async function saveMailShop(v) {
+  const s = load();
+  s.mail.shop_email = v.shop_email;
+  SHOP_KEYS.forEach(k => { s.settings[k] = v[k]; });
+  save(s);
+}
+export async function listMailLog({ reservationId, limit = 50 } = {}) {
+  const log = load().mail.log;
+  return structuredClone((reservationId ? log.filter(l => l.reservation_id === reservationId) : log).slice(0, limit));
+}
+export async function sendTestMail({ template_key, template, to }) {
+  await wait(500);
+  const s = load();
+  const tpl = template || s.mail.templates.find(t => t.key === template_key);
+  const vars = mailVars(s, sampleReservation(todayKey(), to));
+  render(tpl, vars);
+  return { ok: true, id: 'demo', unknown: unknownKeys(tpl.subject + tpl.body, vars) };
 }

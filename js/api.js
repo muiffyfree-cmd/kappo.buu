@@ -164,6 +164,52 @@ export async function saveSettings(v) {
   unwrap(await supabase.from('settings').update(body).eq('id', 1));
 }
 
+/* ---------- 予約メール（mail_templates / mail_settings / mail_log ＋ settings の店の情報） ---------- */
+export const SHOP_FIELDS = ['shop_tel', 'tel_hours', 'shop_address', 'shop_access', 'site_url', 'cancel_policy'];
+const TEMPLATE_ORDER = ['customer_confirmed', 'customer_cancelled', 'shop_new'];
+
+/** 文面3つ（決まった順） */
+export async function listMailTemplates() {
+  const rows = DEMO ? await demo.listMailTemplates() : unwrap(await supabase.from('mail_templates').select('*'));
+  return rows.sort((a, b) => TEMPLATE_ORDER.indexOf(a.key) - TEMPLATE_ORDER.indexOf(b.key));
+}
+export async function saveMailTemplate({ key, enabled, subject, body }) {
+  if (DEMO) return demo.saveMailTemplate({ key, enabled, subject, body });
+  unwrap(await supabase.from('mail_templates').update({ enabled, subject, body }).eq('key', key));
+}
+/** 店の通知先（非公開）＋メールに差し込む店の情報 */
+export async function getMailShop() {
+  if (DEMO) return demo.getMailShop();
+  const [s, m] = await Promise.all([
+    getSettings({ fresh: true }),
+    supabase.from('mail_settings').select('shop_email').eq('id', 1).single().then(unwrap),
+  ]);
+  return { shop_email: m.shop_email, ...Object.fromEntries(SHOP_FIELDS.map(k => [k, s[k] ?? ''])), course_service_note: s.course_service_note };
+}
+export async function saveMailShop(v) {
+  settingsCache = null;
+  if (DEMO) return demo.saveMailShop(v);
+  unwrap(await supabase.from('mail_settings').update({ shop_email: v.shop_email }).eq('id', 1));
+  unwrap(await supabase.from('settings').update(Object.fromEntries(SHOP_FIELDS.map(k => [k, v[k]]))).eq('id', 1));
+}
+/** 送信履歴（新しい順）。予約を指定するとその予約の分だけ */
+export async function listMailLog({ reservationId, limit = 50 } = {}) {
+  if (DEMO) return demo.listMailLog({ reservationId, limit });
+  let q = supabase.from('mail_log').select('*, reservations(code, name)').order('created_at', { ascending: false }).limit(limit);
+  if (reservationId) q = q.eq('reservation_id', reservationId);
+  return unwrap(await q);
+}
+/** テスト送信（Edge Function へ。管理者のログイン情報が自動で付く）→ { ok, unknown } */
+export async function sendTestMail({ template_key, template, to }) {
+  if (DEMO) return demo.sendTestMail({ template_key, template, to });
+  const { data, error } = await supabase.functions.invoke('reservation-mail', { body: { type: 'TEST', template_key, template, to } });
+  if (error) {
+    const body = await error.context?.json?.().catch(() => null);
+    throw new Error(body?.error || error.message);
+  }
+  return data;
+}
+
 /* ---------- 空き状況のまとめ ----------
    日ごと・部ごとに ○△×休－ を決める
    ×：受付中の枠の残席の最大値が 0／△：最大値 ≤ few_threshold／○：それ以外

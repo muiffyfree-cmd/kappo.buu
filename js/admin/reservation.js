@@ -1,7 +1,7 @@
 /* admin/reservation.html：予約の詳細・編集・電話/DM予約の新規登録 */
 import { $, $$, esc, todayKey, jpDate, PART } from '../util.js';
-import { getSettings, getReservation, saveReservation, slotRemaining, errorText, courseOptions } from '../api.js';
-import { guard, toast, STATUS, SOURCE, ACTIVE } from './common.js';
+import { getSettings, getReservation, saveReservation, slotRemaining, errorText, courseOptions, listMailLog } from '../api.js';
+import { guard, toast, STATUS, SOURCE, ACTIVE, MAIL_STATUS, MAIL_TEMPLATE } from './common.js';
 
 const params = new URLSearchParams(location.search);
 const id = params.get('id');
@@ -48,14 +48,42 @@ if (id) {
   $('#metaText').textContent = `経路：${SOURCE[R.source] || R.source}／登録：${new Date(R.created_at).toLocaleString('ja-JP')}`;
   radio('source', R.source); f.elements.day.value = R.day; radio('service', R.service); fillSlots(R.slot);
   for (const k of ['people', 'course', 'name', 'tel', 'email', 'note', 'staff_memo']) f.elements[k].value = R[k] ?? '';
+  f.elements.notify_customer.checked = R.notify_customer !== false;
   renderStatus();
+  loadMailLog();
 } else {
   const day = /^\d{4}-\d{2}-\d{2}$/.test(params.get('day') || '') ? params.get('day') : todayKey();
   radio('source', 'phone'); f.elements.day.value = day; radio('service', params.get('service') === 'lunch' ? 'lunch' : 'dinner');
   fillSlots(S[radioVal('service') + '_slots'][0]);
   f.elements.people.value = 2;
+  f.elements.notify_customer.checked = false;   // 電話・DM予約は、送るときだけチェックする
   f.elements.course.value = COURSES[radioVal('service')][0];
 }
+/* 確認メールのチェック：メールアドレスがないときは押せない */
+function updateNotify() {
+  const has = !!val('email').trim();
+  f.elements.notify_customer.disabled = !has;
+  $('#notifyHint').textContent = !has ? '（メールアドレスを入れると選べます）'
+    : R ? '（キャンセルにしたとき、キャンセルのメールも送ります）' : '（登録すると予約完了のメールが届きます）';
+}
+f.elements.email.addEventListener('input', updateNotify);
+updateNotify();
+
+/* この予約の送信履歴 */
+async function loadMailLog() {
+  if (!R) return;
+  $('#mailPanel').hidden = false;
+  try {
+    const rows = await listMailLog({ reservationId: R.id });
+    $('#mailLog').innerHTML = rows.length ? `<ul class="mlog">${rows.map(l => `<li class="is-${esc(l.status)}">
+      <span class="st">${esc(MAIL_STATUS[l.status] || l.status)}</span>
+      <span class="main"><b>${esc(MAIL_TEMPLATE[l.template_key] || l.template_key)}</b>
+        <span>${esc(new Date(l.created_at).toLocaleString('ja-JP'))}・${esc(l.to_email)}</span>
+        ${l.error ? `<span class="err">${esc(l.error)}</span>` : ''}</span></li>`).join('')}</ul>`
+      : '<p class="muted">この予約に送ったメールはありません</p>';
+  } catch (e) { $('#mailLog').innerHTML = `<p class="msg">${esc(errorText(e))}</p>`; }
+}
+
 $('#backLink').href = `/admin/calendar.html?m=${val('day').slice(0, 7)}&day=${val('day')}`;
 updateLeft();
 
@@ -83,6 +111,7 @@ async function setStatus(st) {
     $('#warn').hidden = true;
     toast(`「${STATUS[st]}」にしました`);
     updateLeft();
+    if (st === 'cancelled') setTimeout(loadMailLog, 2500);   // キャンセルのメールは Webhook 経由で少し遅れて記録される
   } catch (e) { $('#msg').textContent = errorText(e); }
 }
 /* 満席の警告（ブラウザの confirm は使わず、画面内で確認） */
@@ -104,6 +133,7 @@ f.addEventListener('submit', async e => {
     source: radioVal('source'), day: val('day'), service: radioVal('service'), slot: val('slot'),
     people: Number(val('people')), course: val('course').trim(), name: val('name').trim(), tel: val('tel').trim(),
     email: val('email').trim(), note: val('note').trim(), staff_memo: val('staff_memo').trim(),
+    notify_customer: !!val('email').trim() && f.elements.notify_customer.checked,
   };
   const er = [];
   if (!data.day) er.push('日付');
@@ -135,6 +165,7 @@ f.addEventListener('submit', async e => {
     $('#pageTitle').textContent = `${R.name} 様の予約`;
     toast('保存しました');
     updateLeft();
+    loadMailLog();
   } catch (err) { msg.textContent = errorText(err); }
   finally { btn.disabled = false; }
 });

@@ -1,4 +1,4 @@
-# 割烹 舞ぅ 公式サイト＋予約管理（v2.2）
+# 割烹 舞ぅ 公式サイト＋予約管理（v2.3）
 
 ## 起動
 
@@ -19,18 +19,23 @@ npm run dev               # → http://localhost:3100（ポート固定）
 
 | # | 作業 |
 |---|---|
-| 1 | `supabase/migrations/0001_init.sql` → `0002_menu.sql` の順に適用（`supabase db push`、または SQL Editor に貼り付け）。0002 でお品書きの表・`menu_public` ビュー・Storage の `menu` バケット（公開読み取り・管理者だけ書き込み）が作られ、初期のお品書きが入ります |
+| 1 | `supabase/migrations/0001_init.sql` → `0002_menu.sql` → `0003_mail.sql` の順に適用（`supabase db push`、または SQL Editor に `supabase/sql-editor/01_setup.sql` → `04_mail.sql` を貼り付け。**すでに 01_setup を実行済みなら 04_mail.sql だけ**）。0003 で予約メールの文面・送信履歴・店の通知先が作られます。0002 でお品書きの表・`menu_public` ビュー・Storage の `menu` バケット（公開読み取り・管理者だけ書き込み）が作られ、初期のお品書きが入ります |
 | 2 | Authentication → Providers で Email を有効化し、**Sign up（新規登録）を無効化** |
 | 3 | Authentication → Users から店のユーザーを招待 → SQL Editor で `insert into admin_users(user_id) values ('<ユーザーのuuid>');` |
 | 4 | Authentication → URL Configuration の Redirect URLs に `http://localhost:3100/admin/reset-password.html` と `https://<ドメイン>/admin/reset-password.html` を追加。Email Templates の「Reset Password」のリンクを `{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=recovery` にする（パスワード再設定用） |
 | 5 | `supabase functions deploy reservation-mail --no-verify-jwt` |
-| 6 | `supabase secrets set RESEND_API_KEY=... MAIL_FROM="割烹 舞ぅ <yoyaku@ドメイン>" SHOP_EMAIL=... SHOP_TEL=095-823-8510 WEBHOOK_SECRET=<長いランダム文字列>` |
-| 7 | Database → Webhooks：`reservations` の INSERT → Edge Function `reservation-mail`、HTTP ヘッダー `x-webhook-secret` に 6 と同じ値 |
-| 8 | `.env` に `VITE_SUPABASE_URL` と `VITE_SUPABASE_ANON_KEY`（anon キー）を書く。**service_role キーは書かない** |
+| 6 | `supabase secrets set RESEND_API_KEY=... MAIL_FROM="割烹 舞ぅ <yoyaku@認証済みドメイン>" WEBHOOK_SECRET=<長いランダム文字列>`（または `supabase secrets set --env-file supabase/functions/functions.env`）。v2.2 の `SHOP_EMAIL` `SHOP_TEL` は使わなくなりました（管理画面の「メール」で設定） |
+| 7 | Database → Webhooks：`reservations` の **INSERT と UPDATE** → Edge Function `reservation-mail`、HTTP ヘッダー `x-webhook-secret` に 6 と同じ値（v2.2 で INSERT だけにしていた場合は UPDATE を足す。キャンセルのメールに必要） |
+| 8 | 管理画面の「メール」で、店の通知先メール・サイトのURL（本番ドメイン）を入れて保存し、テスト送信で届くことを確認 |
+| 9 | `.env` に `VITE_SUPABASE_URL` と `VITE_SUPABASE_ANON_KEY`（anon キー）を書く。**service_role キーは書かない** |
 
 - 公開側は RPC（`get_availability` / `create_reservation`）だけを使い、予約テーブルは読めません（RLS）
 - 予約・休業日・お知らせ・お品書き・設定は Table Editor から直接編集しても、そのまま画面に反映されます
-- メールは、お客様にはメールアドレスがある予約すべて、店には Web 予約のときに送ります
+- メール（文面は管理画面の「メール」で編集）：
+  - 予約が入ったとき → お客様に「予約完了」（メールアドレスがあり「確認メールを送る」がオンのとき。Web予約は常にオン、管理画面での新規登録は初期値オフ）、店に「新しい予約」（Web予約のときだけ）
+  - 予約を「キャンセル」にしたとき → お客様に「キャンセル完了」
+  - 同じ予約・同じ文面は二度送りません。送信結果は「メール」画面と予約の詳細画面の送信履歴で見られます
+  - 店の通知先メールは `mail_settings`（管理者だけが読める）に置いています。`settings` は公開側から読めるため
 
 ### お品書き（管理画面 → お品書き）
 - 区分ごとの一覧で ↑↓ の並べ替え、「お休みに／提供する」の切り替え、編集・追加・削除ができます。保存するとすぐトップと menu.html に反映されます
@@ -72,13 +77,23 @@ npm run dev               # → http://localhost:3100（ポート固定）
 | `js/config.js` | 電話番号・受付時間・キャンセル規定など（コースは `menu_items` で管理） |
 | `supabase/migrations/0001_init.sql` | テーブル・RLS・関数（予約まわり） |
 | `supabase/migrations/0002_menu.sql` | お品書き・`menu_public`・Storage `menu` |
-| `supabase/functions/reservation-mail/index.ts` | 確認メール（Resend） |
-| `reference/` | デザインの元（`concept-section.*` `backgrounds.css` など）。`reference/zip-v2.2/` は zip に入っていたが採用しなかった `0001_init.sql` と `reservation-mail`（下記）。`reference/v1/` は v1 の指示書と GAS |
+| `supabase/migrations/0003_mail.sql` | 予約メール（`mail_templates` `mail_log` `mail_settings`、`settings` に店の情報、`reservations.notify_customer`） |
+| `supabase/sql-editor/` | SQL Editor に貼る版（`01_setup`＝0001＋0002、`04_mail`＝0003） |
+| `supabase/functions/reservation-mail/index.ts` | 予約メールの送信（Resend）。Webhook とテスト送信 |
+| `supabase/functions/_shared/mail-render.js` | 文面の差し込み・HTML化。Edge Function と管理画面のプレビュー（`js/mail-render.js`）で同じものを使う |
+| `reference/` | デザインの元（`concept-section.*` `backgrounds.css` など）。`reference/zip-v2.3/` は v2.3 の zip の 0003・Edge Function の原本（列名をこのプロジェクトに合わせて書き直したため）。`reference/zip-v2.2/` は zip に入っていたが採用しなかった `0001_init.sql` と `reservation-mail`（下記）。`reference/v1/` は v1 の指示書と GAS |
 
 ### zip の `0001_init.sql` を使っていない理由
 zip の 0001 は列名（`start_time`・`seats_total`）や状態名が違い、`slot_remaining` に実行権限がない（管理画面の満席チェックが失敗する）・`bookable`（締切）を返さない・締切後の予約を止めない、という違いがあったため、テスト済みの 0001 をそのまま使い、その上に zip の 0002 を適用しています（0002 は `settings`・`is_admin()`・`touch_updated_at()` だけに依存）。指示書の「PostgreSQL 16 で動作確認済み」に対し、こちらは PGlite（PostgreSQL 18）で確認しています。
 
-## 確認したこと（2026-11-05）
+## 確認したこと
+
+### v2.3（2026-11-09）
+- SQL：0001→0002→0003、および sql-editor の 01_setup→04_mail を PGlite で適用。anon は文面・履歴・通知先を読めない（`settings` の店の情報は読める）、管理者以外は0件、管理者は文面・通知先を更新できる、`mail_log` には書けない、Web予約は `notify_customer = true`、service_role が `slot_remaining` を実行できる、「送信中」の取り合いで二重送信しない・失敗後は再送できる（24項目）。SQL と JS の文面の初期値が同じこと
+- Edge Function：esbuild で束ねて Node 上で（Supabase と Resend は模擬）、合言葉、Web予約で2通・返信先、二重の Webhook で送らない、キャンセル以外の更新で送らない、電話予約は店に通知しない、`notify_customer` オフ、停止中の文面、失敗の記録と再送、テスト送信の権限・宛先チェック・保存前の文面・書き間違いの返却、CORS（27項目）
+- 画面（デモ）：文面の編集・差し込み項目の挿入・書き間違いの警告と確認・保存・初期の文面に戻す・プレビュー・テスト送信、電話予約を「確認メールを送る」で登録→キャンセル→予約の詳細に送信履歴が出る、390px で横スクロールなし、コンソールエラーなし
+- **未確認**：実際の Supabase・Resend での送信（Deno の型チェックも未実施）
+
 
 ### v2.2
 - SQL：0001＋0002 を PGlite で適用。anon は `menu_public` を読める（味彩御膳は出ない）・`menu_items` に書けない、管理者は編集でき公開側に反映される
@@ -100,8 +115,10 @@ zip の 0001 は列名（`start_time`・`seats_total`）や状態名が違い、
 | サービス料 | 管理画面 → お品書き（共通の注記） | コースのみ10%（v2 の「なし」を訂正済み） |
 | お品書きの写真 | 管理画面 → お品書き | しゃぶしゃぶコース以外は写真なし |
 | 17席の内訳 | `index.html` `concept.html` | 未記載（計算も合計17席で行う） |
-| 電話の受付時間 | `js/config.js` `partials/header.html` | 10:00–22:00（日曜休） |
-| キャンセル規定 | `js/config.js` `reserve.html` `reservation-mail/index.ts` | 前日50%／当日100% |
+| 電話の受付時間 | `js/config.js` `partials/header.html`、メールは管理画面 → メール | 10:00–22:00（日曜休） |
+| サイトのURL（メールのリンク） | 管理画面 → メール | `http://localhost:3100`（本番ドメインに変える） |
+| 店の通知先メール | 管理画面 → メール | 未設定（空のあいだは店への通知を送らない） |
+| キャンセル規定 | `js/config.js` `reserve.html`、メールは管理画面 → メール（`settings.cancel_policy`） | 前日50%／当日100% |
 | ご挨拶文・店主名 | `index.html` | 試作の文章・「〇〇 〇〇」 |
 | こだわりの本文 | `concept.html` | 仮の文章 |
 | 店内・カウンターの写真 | `concept.html`（其の三は今は外観） | 外観写真・「写真準備中」の枠 |

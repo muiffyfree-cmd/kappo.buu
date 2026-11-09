@@ -41,6 +41,7 @@
     <label class="fld">お名前<input name="name" autocomplete="off" required maxlength="100"></label>
     <label class="fld">電話番号<input name="tel" type="tel" inputmode="tel" autocomplete="off" maxlength="30"></label>
     <label class="fld">メールアドレス<span class="hint">任意（Webからの予約には入っています）</span><input name="email" type="email" autocomplete="off" maxlength="200"></label>
+    <div class="checks" id="notifyWrap"><label><input type="checkbox" name="notify_customer">お客様に確認メールを送る<span class="hint" id="notifyHint"></span></label></div>
     <label class="fld">アレルギー・ご要望<textarea name="note" maxlength="1000"></textarea></label>
     <label class="fld">店用メモ<span class="hint">お客様には見えません</span><textarea name="staff_memo"></textarea></label>
     <div class="warn" id="warn" role="alert" hidden></div>
@@ -50,6 +51,11 @@
       <button class="b b--black" type="submit" id="saveBtn">保存する</button>
     </div>
   </form>
+
+  <section class="panel" id="mailPanel" aria-labelledby="mailTitle" hidden>
+    <h2 id="mailTitle">この予約のメール<span class="sp" style="flex:1"></span><a class="b b--sm b--line" href="/admin/mail.html">文面を編集</a></h2>
+    <div id="mailLog"></div>
+  </section>
 </main>
 <script type="module" src="/js/admin/reservation.js"></script>
 </body>

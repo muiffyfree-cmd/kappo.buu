@@ -38,7 +38,7 @@ const pages = {
   reserve: 'reserve.html', privacy: 'privacy.html',
   'admin/login': 'admin/login.html', 'admin/reset-password': 'admin/reset-password.html', 'admin/index': 'admin/index.html', 'admin/calendar': 'admin/calendar.html',
   'admin/reservation': 'admin/reservation.html', 'admin/closed': 'admin/closed.html', 'admin/menu': 'admin/menu.html',
-  'admin/news': 'admin/news.html', 'admin/settings': 'admin/settings.html',
+  'admin/mail': 'admin/mail.html', 'admin/news': 'admin/news.html', 'admin/settings': 'admin/settings.html',
 };
 
 export default defineConfig(({ mode }) => ({

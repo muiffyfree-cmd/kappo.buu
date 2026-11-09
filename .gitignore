@@ -5,3 +5,5 @@ dist/
 !.env.example
 supabase/.temp/
 screenshots/
+supabase/functions/.env
+supabase/functions/functions.env
